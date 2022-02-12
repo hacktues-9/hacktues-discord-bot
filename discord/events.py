@@ -134,7 +134,7 @@ class Events(commands.Cog):
                 return
 
             reason = "Member joined"
-            participant_r = utils.get(member.guild.roles, name='Участник')
+            participant_r = utils.get(member.guild.roles, name='Потребител')
             unapproved_r = utils.get(member.guild.roles, name='Непотвърден')
 
             await member.add_roles(participant_r, reason=reason)
