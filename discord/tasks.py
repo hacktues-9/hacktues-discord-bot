@@ -29,8 +29,9 @@ class Tasks(commands.Cog):
         await self.all_teams.delete()
         self.all_teams = (await self.teams_channel.
                           send("self.all_teams: "))
-        count = len(teams)
-        await self.label.edit(name=f'Брой отбори: {count}')
+        # count = len(teams)
+        count = len([elem for elem in teams if elem['approved'] is True])
+        await self.label.edit(name=f'Брой отбори: {count} / 50')
         
         for team in teams:
             team_name = 'team ' + team['teamName']
