@@ -7,6 +7,7 @@ from utils import get_team_role, request, send_log
 
 import channels
 
+MAX_TEAMS_COUNT = 50
 
 class Tasks(commands.Cog):
     def __init__(self, bot):
@@ -31,7 +32,12 @@ class Tasks(commands.Cog):
                           send("self.all_teams: "))
         # count = len(teams)
         count = len([elem for elem in teams if elem['approved'] is True])
-        await self.label.edit(name=f'Брой отбори: {count} / 50')
+
+        if (count > MAX_TEAMS_COUNT):
+            max = count
+        else:
+            max = MAX_TEAMS_COUNT
+        await self.label.edit(name=f'Брой отбори: {count} / {max}')
         
         for team in teams:
             team_name = 'team ' + team['teamName']
