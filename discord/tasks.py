@@ -7,7 +7,7 @@ from utils import get_team_role, request, send_log
 
 import channels
 
-MAX_TEAMS_COUNT = 50
+MAX_TEAMS_COUNT = 52
 
 class Tasks(commands.Cog):
     def __init__(self, bot):
