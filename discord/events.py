@@ -55,13 +55,14 @@ class Events(commands.Cog):
                         if(response['isMentor']):
                             role = discord.utils.get(message_copy.guild.roles, name="Ментор")
                             await message_copy.author.add_roles(role, reason="authenticated mentor")
-                            return
+                        else:
+                            role = discord.utils.get(message_copy.guild.roles, name="Потребител")
+                            await message_copy.author.add_roles(role, reason="authenticated")   
 
                         nickname = response['fullName']
                         await message_copy.author.edit(nick=nickname)
 
-                        role = discord.utils.get(message_copy.guild.roles, name="Потребител")
-                        await message_copy.author.add_roles(role, reason="authenticated")
+                        
             
             # elif(('@' in message_copy) and (len(message_copy.split(" ")) == 1)):
             #     assert 'верификация' in message_copy.channel.name, 'Problem outside auth channel'

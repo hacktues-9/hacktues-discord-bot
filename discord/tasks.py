@@ -7,7 +7,7 @@ from utils import get_team_role, request, send_log
 
 import channels
 
-MAX_TEAMS_COUNT = 52
+MAX_TEAMS_COUNT = 50
 
 class Tasks(commands.Cog):
     def __init__(self, bot):
@@ -117,6 +117,10 @@ class Tasks(commands.Cog):
         await self.bot.wait_until_ready()
         self.guild = await self.bot.fetch_guild(871120127976951818)
         self.label = await self.bot.fetch_channel(channels.REGISTERED)
+
+        # self.teams_channel = await self.bot.fetch_channel(channels.TEAMS)
+        # self.all_teams = await self.teams_channel.send(":")
+
         self.teams_channel = await self.bot.fetch_channel(channels.TEAMS)
         self.all_teams = await self.teams_channel.send(":")
         self.captain_role = utils.get(self.guild.roles, name='Капитан')
