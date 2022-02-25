@@ -135,7 +135,7 @@ class Commands(commands.Cog):
         channel = await self.bot.fetch_channel(channels.MOTIVATIONS)
         messages = [message async for message in channel.history()]
         message = random.choice(messages)
-        await ctx.send(message.embeds[0].url)
+        await ctx.send(message.attachments[0].url)
 
     @commands.command(aliases=['email', 'имейл', 'емаил'])
     async def auth_email(self, ctx, email):
