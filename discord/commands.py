@@ -158,6 +158,7 @@ class Commands(commands.Cog):
 
     # give_user_points
     # (user, points, reason)
+    @commands.has_role('Организатор')
     @commands.command(aliases=['give', 'g'])
     async def give_points(self, ctx, user: discord.User, points, reason="No reason specified"):
         # get discord id
