@@ -156,3 +156,5 @@ class Commands(commands.Cog):
                 err_msg = list(response['errors'].values())[0]
                 await remessage(ctx.author.send, f'Хей, Гришо е!\n{err_msg} \n{SAD}', ctx.message)
 
+    # give_user_points
+    # (user, points, reason)

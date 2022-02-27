@@ -14,30 +14,34 @@ class Tasks(commands.Cog):
         self.reason = 'tasks'
         self.bot = bot
         self.fetch_teams.start()
+        self.fetch_leaderboard.start()
 
     def cog_unload(self):
         self.fetch_teams.cancel()
+        self.fetch_leaderboard.cancel()
 
     @tasks.loop(minutes=3)
     async def fetch_teams(self):
-        print('fetching teams...')
+        print('Fetching teams...')
 
         async with aiohttp.ClientSession() as client:
             teams = await request(self.bot, client, path='api/team/get-teams')
             teams = teams['response']
 
-        # Writes every team as a text message in a separate channel
+        # ! Writes every team as a text message in a separate channel
         await self.all_teams.delete()
         self.all_teams = (await self.teams_channel.
                           send("self.all_teams: "))
-        # count = len(teams)
+
         count = len([elem for elem in teams if elem['approved'] is True])
 
         if (count > MAX_TEAMS_COUNT):
             max = count
         else:
             max = MAX_TEAMS_COUNT
-        await self.label.edit(name=f'Брой отбори: {count} / {max}')
+
+        # ! Changes label of a channel to the current team count
+        # await self.label.edit(name=f'Брой отбори: {count} / {max}')
         
         for team in teams:
             team_name = 'team ' + team['teamName']
@@ -56,7 +60,7 @@ class Tasks(commands.Cog):
                 await member.add_roles(role, reason=self.reason)
         '''
         # ? Cycle through users and sets *captain*, *team* roles
-        print('fetching users...')
+        print('Fetching users...')
         async with aiohttp.ClientSession() as client:
             users = await request(self.bot, client, path='api/user/get-discord-users')
             users = users['response']
@@ -110,17 +114,40 @@ class Tasks(commands.Cog):
                 role = await get_team_role(team_name, member.guild, reason)
                 await member.add_roles(role, reason=self.reason)
                 
-        
+    @tasks.loop(minutes=1)
+    async def fetch_leaderboard(self):
+        print("Fetching Leaderboard...")
+
+        async with aiohttp.ClientSession() as client:
+            leaderboard = await request(self.bot, client, path='api/team/get-leaderboard')
+            leaderboard = leaderboard['response']
+        leaderboard_message = ("**GrishoPoints (GP) класация**\n"
+        "*GP се печелят от участие, събития или тайни задачи*\n"
+        "\n"
+        f":first_place: {leaderboard[0]['teamName']} ({leaderboard[0]['grishoPoints']})\n"
+        f":second_place: {leaderboard[1]['teamName']} ({leaderboard[1]['grishoPoints']})\n"
+        f":third_place: {leaderboard[2]['teamName']} ({leaderboard[2]['grishoPoints']})\n"
+        f"       {leaderboard[3]['teamName']} ({leaderboard[3]['grishoPoints']})\n"
+        f"       {leaderboard[4]['teamName']} ({leaderboard[4]['grishoPoints']})")
+
+        # for team in leaderboard:
+        #     leaderboard_message += f"{team['grishoPoints']} - {team['teamName']}\n"
+
+        await self.leaderboard_message.edit(content=leaderboard_message)
+        print(leaderboard_message)
+
+
+    @fetch_leaderboard.before_loop
+    async def before_fetch_leaderboard(self):
+        await self.bot.wait_until_ready()
+        self.leaderboard_channel = await self.bot.fetch_channel(channels.LEADERBOARD)
+        self.leaderboard_message = await self.leaderboard_channel.fetch_message("946737521742733312") 
 
     @fetch_teams.before_loop
     async def after_init(self):
         await self.bot.wait_until_ready()
         self.guild = await self.bot.fetch_guild(871120127976951818)
-        self.label = await self.bot.fetch_channel(channels.REGISTERED)
-
-        # self.teams_channel = await self.bot.fetch_channel(channels.TEAMS)
-        # self.all_teams = await self.teams_channel.send(":")
-
+        # self.label = await self.bot.fetch_channel(channels.REGISTERED)
         self.teams_channel = await self.bot.fetch_channel(channels.TEAMS)
         self.all_teams = await self.teams_channel.send(":")
         self.captain_role = utils.get(self.guild.roles, name='Капитан')
