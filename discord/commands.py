@@ -158,3 +158,21 @@ class Commands(commands.Cog):
 
     # give_user_points
     # (user, points, reason)
+    @commands.command(aliases=['give', 'g'])
+    async def give_points(self, ctx, user: discord.User, points, reason="No reason specified"):
+        # get discord id
+        user_id = str(user.id)
+        print("discordId", user_id)
+
+        # send request
+        auth_token = os.getenv('auth_token')
+        headers = {"Authorization": f"Bearer {auth_token}"}
+        async with aiohttp.ClientSession(headers=headers) as client:
+            response = await request(self.bot, client, path='api/team/add-points', discordId=user_id, points=int(points))
+            if(response['success']):
+                # send message of success
+                await ctx.send(f"Бяха дадени {points} точки на отбор {response['response']['teamName']}. Общо {response['response']['grishoPoints']}")
+            else:
+                err_msg = response['response']
+                await ctx.send(f'\n{err_msg} \n{SAD}')
+

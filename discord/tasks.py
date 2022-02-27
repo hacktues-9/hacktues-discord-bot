@@ -134,7 +134,7 @@ class Tasks(commands.Cog):
         #     leaderboard_message += f"{team['grishoPoints']} - {team['teamName']}\n"
 
         await self.leaderboard_message.edit(content=leaderboard_message)
-        print(leaderboard_message)
+        # print(leaderboard_message)
 
 
     @fetch_leaderboard.before_loop
