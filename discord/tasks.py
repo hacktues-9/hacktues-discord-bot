@@ -69,7 +69,7 @@ class Tasks(commands.Cog):
             print("user", user)
 
             # The owner of the guild
-            if(user['discordId'] == '301127355014053889'):
+            if(user['discordId'] == channels.GUILD_OWNER_ID):
                 continue
 
             try:
@@ -141,12 +141,12 @@ class Tasks(commands.Cog):
     async def before_fetch_leaderboard(self):
         await self.bot.wait_until_ready()
         self.leaderboard_channel = await self.bot.fetch_channel(channels.LEADERBOARD)
-        self.leaderboard_message = await self.leaderboard_channel.fetch_message("946737521742733312") 
+        self.leaderboard_message = await self.leaderboard_channel.fetch_message(str(channels.LEADERBOARD_MESSAGE)) 
 
     @fetch_teams.before_loop
     async def after_init(self):
         await self.bot.wait_until_ready()
-        self.guild = await self.bot.fetch_guild(871120127976951818)
+        self.guild = await self.bot.fetch_guild(channels.GUILD_ID)
         # self.label = await self.bot.fetch_channel(channels.REGISTERED)
         self.teams_channel = await self.bot.fetch_channel(channels.TEAMS)
         self.all_teams = await self.teams_channel.send(":")

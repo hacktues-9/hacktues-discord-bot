@@ -6,6 +6,7 @@ from aiohttp.helpers import TOKEN
 
 import discord
 from discord.ext import commands
+from discord.utils import get
 
 import channels
 from emojis import SUNGLASSES, SAD
@@ -176,4 +177,12 @@ class Commands(commands.Cog):
             else:
                 err_msg = response['response']
                 await ctx.send(f'\n{err_msg} \n{SAD}')
+
+    @commands.has_role('Организатор')
+    @commands.command(aliases=["updatementors"])
+    async def update_mentors(self, ctx, role):
+        if get(ctx.guild.roles, name=role):
+            await ctx.send("Role already exists")
+        else:
+            await ctx.guild.create_role(name=role)
 

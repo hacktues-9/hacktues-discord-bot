@@ -16,6 +16,7 @@ import discord
 from discord.ext import commands
 
 from emojis import SUNGLASSES, SAD
+from channels import GUILD_ID
 
 class Events(commands.Cog):
     def __init__(self, bot):
@@ -55,6 +56,7 @@ class Events(commands.Cog):
                         if(response['isMentor']):
                             role = discord.utils.get(message_copy.guild.roles, name="Ментор")
                             await message_copy.author.add_roles(role, reason="authenticated mentor")
+     
                         else:
                             role = discord.utils.get(message_copy.guild.roles, name="Потребител")
                             await message_copy.author.add_roles(role, reason="authenticated")   
@@ -62,7 +64,9 @@ class Events(commands.Cog):
                         nickname = response['fullName']
                         await message_copy.author.edit(nick=nickname)
 
-                        
+                        unapproved_r = utils.get(message_copy.author.guild.roles, name='Непотвърден')
+                        await message_copy.author.remove_roles(unapproved_r, reason="Authenticated")
+                                    
             
             # elif(('@' in message_copy) and (len(message_copy.split(" ")) == 1)):
             #     assert 'верификация' in message_copy.channel.name, 'Problem outside auth channel'
@@ -84,7 +88,7 @@ class Events(commands.Cog):
 
                     
         if isinstance(message.channel, channel.DMChannel):
-            guild = await self.bot.fetch_guild(871120127976951818)
+            guild = await self.bot.fetch_guild(GUILD_ID)
             name = message.author.display_name.replace(' ', '-').lower()
             # chans = await guild.fetch_channels()
             category = await self.bot.fetch_channel(channels.DM)
