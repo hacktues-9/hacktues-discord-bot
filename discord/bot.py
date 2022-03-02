@@ -19,14 +19,17 @@ def main():
 
     load_dotenv()
     TOKEN = os.getenv('token')
+    MODE = os.getenv('mode')
 
     intents = discord.Intents.all()
     bot = commands.Bot(command_prefix=('хт ', 'ht '),
                        help_command=None, intents=intents)
 
-    bot.add_cog(Events(bot))
+    if (MODE == "prod"):
+        bot.add_cog(Events(bot))
     bot.add_cog(Commands(bot))
-    # bot.add_cog(Tasks(bot))
+    if (MODE == "prod"):
+        bot.add_cog(Tasks(bot))
     bot.load_extension("jishaku")
     bot.run(TOKEN)
 
