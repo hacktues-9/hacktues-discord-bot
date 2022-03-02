@@ -16,6 +16,7 @@ import discord
 from discord.ext import commands
 
 from emojis import SUNGLASSES, SAD
+from channels import GUILD_ID
 
 class Events(commands.Cog):
     def __init__(self, bot):
@@ -52,9 +53,39 @@ class Events(commands.Cog):
                 async with aiohttp.ClientSession(headers=headers) as client:
                     response = await request(self.bot, client, path='api/user/validate-discord-token', discordToken=message_copy.content)
                     if(response['success']):
+                        # Mentor
                         if(response['isMentor']):
+                            reason = "mentor auth"
                             role = discord.utils.get(message_copy.guild.roles, name="Ментор")
                             await message_copy.author.add_roles(role, reason="authenticated mentor")
+                            
+                            try:
+                                # send request
+                                auth_token = os.getenv('auth_token')
+                                headers = {"Authorization": f"Bearer {auth_token}"}
+                                async with aiohttp.ClientSession(headers=headers) as client:
+                                    response_i = await request(self.bot, client, path='api/user/get-mentor-info', mentorName=response['fullName'])
+
+                                    # Add technologies
+                                    technologies = response_i['technologies']
+                                    for tech in technologies:
+                                        if not discord.utils.get(message_copy.guild.roles, name=tech):
+                                            await message_copy.guild.create_role(name=tech)
+
+                                        role = discord.utils.get(message_copy.guild.roles, name=tech)
+                                        
+                                        if role not in message_copy.author.roles:
+                                            await message_copy.author.add_roles(role, reason=reason)
+
+                                    # Add team role. Note: Add 'team' in front of the team name
+                                    if response_i["teamName"]:
+                                        team_name = 'team ' + response_i["teamName"]
+                                        team_role = await get_team_role(team_name, message_copy.guild, reason)
+
+                                        await message_copy.author.add_roles(team_role, reason=reason)
+                            except Exception as e:
+                                print(e)
+                        # Not mentor
                         else:
                             role = discord.utils.get(message_copy.guild.roles, name="Потребител")
                             await message_copy.author.add_roles(role, reason="authenticated")   
@@ -62,7 +93,9 @@ class Events(commands.Cog):
                         nickname = response['fullName']
                         await message_copy.author.edit(nick=nickname)
 
-                        
+                        unapproved_r = utils.get(message_copy.author.guild.roles, name='Непотвърден')
+                        await message_copy.author.remove_roles(unapproved_r, reason="Authenticated")
+                                    
             
             # elif(('@' in message_copy) and (len(message_copy.split(" ")) == 1)):
             #     assert 'верификация' in message_copy.channel.name, 'Problem outside auth channel'
@@ -84,7 +117,7 @@ class Events(commands.Cog):
 
                     
         if isinstance(message.channel, channel.DMChannel):
-            guild = await self.bot.fetch_guild(871120127976951818)
+            guild = await self.bot.fetch_guild(GUILD_ID)
             name = message.author.display_name.replace(' ', '-').lower()
             # chans = await guild.fetch_channels()
             category = await self.bot.fetch_channel(channels.DM)

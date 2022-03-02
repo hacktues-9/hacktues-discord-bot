@@ -8,6 +8,7 @@ import discord
 from discord.ext import commands
 
 import channels
+from utils import get_team_role
 from emojis import SUNGLASSES, SAD
 import emojis
 from utils import remessage, request, resend
@@ -176,4 +177,52 @@ class Commands(commands.Cog):
             else:
                 err_msg = response['response']
                 await ctx.send(f'\n{err_msg} \n{SAD}')
+
+    @commands.has_role('Организатор')
+    @commands.command(aliases=["updatementors"])
+    async def update_mentors(self, ctx):
+        await ctx.send("Starting update_mentors...");
+        reason = "updatementors"
+
+        for member in ctx.guild.members:
+            role = discord.utils.get(ctx.guild.roles, name="Ментор")
+            # Get mentors
+            if role in member.roles:
+                if member.nick:
+                    name = member.nick
+                else:
+                    name = member.name
+                
+                print("Current mentor:", name)
+
+                # send request
+                auth_token = os.getenv('auth_token')
+                headers = {"Authorization": f"Bearer {auth_token}"}
+                async with aiohttp.ClientSession(headers=headers) as client:
+                    response = await request(self.bot, client, path='api/user/get-mentor-info', mentorName=name)
+
+                    # Add technologies
+                    technologies = response['technologies']
+                    for tech in technologies:
+                        if not discord.utils.get(ctx.guild.roles, name=tech):
+                            await ctx.guild.create_role(name=tech)
+
+                        role = discord.utils.get(ctx.guild.roles, name=tech)
+                        
+                        if role not in member.roles:
+                            try:
+                                await member.add_roles(role, reason=reason)
+                            except Exception as e:
+                                print(e)
+
+                    # Add team role. Note: Add 'team' in front of the team name
+                    if response["teamName"]:
+                        team_name = 'team ' + response["teamName"]
+                        team_role = await get_team_role(team_name, ctx.guild, reason)
+
+                        await member.add_roles(team_role, reason=reason)
+
+        await ctx.send("update_mentors done!");
+
+
 
