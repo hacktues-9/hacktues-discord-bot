@@ -130,7 +130,6 @@ class Commands(commands.Cog):
         await ctx.send(f"{emojis.PONG} Понг с "
                        f"{str(round(self.bot.latency, 2))} s")
 
-    # TODO make it work with images which are NOT urls
     @commands.command(aliases=['мотивирай', 'мот', 'mot'])
     async def motivate(self, ctx):
         channel = await self.bot.fetch_channel(channels.MOTIVATIONS)
@@ -195,12 +194,15 @@ class Commands(commands.Cog):
                 
                 print("Current mentor:", name)
 
+                if(name == "Манол Ружинов"):
+                    continue
+
                 # send request
                 auth_token = os.getenv('auth_token')
                 headers = {"Authorization": f"Bearer {auth_token}"}
                 async with aiohttp.ClientSession(headers=headers) as client:
                     response = await request(self.bot, client, path='api/user/get-mentor-info', mentorName=name)
-
+                    
                     # Add technologies
                     technologies = response['technologies']
                     for tech in technologies:
@@ -222,7 +224,9 @@ class Commands(commands.Cog):
 
                         await member.add_roles(team_role, reason=reason)
 
+                # for role in member.roles:
+                #     print("ROLE     ", role)
+                #     if 'team' not in role.name and role.name != 'Ментор':
+                #         await role.edit(mentionable=True)
+                
         await ctx.send("update_mentors done!");
-
-
-

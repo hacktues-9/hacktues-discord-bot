@@ -71,6 +71,10 @@ class Events(commands.Cog):
                                     for tech in technologies:
                                         if not discord.utils.get(message_copy.guild.roles, name=tech):
                                             await message_copy.guild.create_role(name=tech)
+                                            new_role = discord.utils.get(message_copy.guild.roles, name=tech)
+
+                                            await new_role.edit(mentionable=True)
+
 
                                         role = discord.utils.get(message_copy.guild.roles, name=tech)
                                         
