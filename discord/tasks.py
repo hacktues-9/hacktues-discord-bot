@@ -14,41 +14,41 @@ class Tasks(commands.Cog):
         self.reason = 'tasks'
         self.bot = bot
         self.fetch_teams.start()
-        self.fetch_leaderboard.start()
+        # self.fetch_leaderboard.start()
 
     def cog_unload(self):
         self.fetch_teams.cancel()
         self.fetch_leaderboard.cancel()
 
-    @tasks.loop(minutes=3)
+    @tasks.loop(minutes=5)
     async def fetch_teams(self):
-        print('Fetching teams...')
+    #     print('Fetching teams...')
 
-        async with aiohttp.ClientSession() as client:
-            teams = await request(self.bot, client, path='api/team/get-teams')
-            teams = teams['response']
+    #     async with aiohttp.ClientSession() as client:
+    #         teams = await request(self.bot, client, path='api/team/get-teams')
+    #         teams = teams['response']
 
         # ! Writes every team as a text message in a separate channel
-        await self.all_teams.delete()
-        self.all_teams = (await self.teams_channel.
-                          send("self.all_teams: "))
+        # await self.all_teams.delete()
+        # self.all_teams = (await self.teams_channel.
+        #                   send("self.all_teams: "))
 
-        count = len([elem for elem in teams if elem['approved'] is True])
+        # count = len([elem for elem in teams if elem['approved'] is True])
 
-        if (count > MAX_TEAMS_COUNT):
-            max = count
-        else:
-            max = MAX_TEAMS_COUNT
+        # if (count > MAX_TEAMS_COUNT):
+        #     max = count
+        # else:
+        #     max = MAX_TEAMS_COUNT
 
         # ! Changes label of a channel to the current team count
         # await self.label.edit(name=f'Брой отбори: {count} / {max}')
         
-        for team in teams:
-            team_name = 'team ' + team['teamName']
-            await self.all_teams.edit(
-                content=f"{self.all_teams.content}\n{team_name}"
-            )
-            '''
+        # for team in teams:
+        #     team_name = 'team ' + team['teamName']
+        #     await self.all_teams.edit(
+        #         content=f"{self.all_teams.content}\n{team_name}"
+        #     )
+        '''
             # ? Cycle through every team's members and try
             # ? to find them in discord and set their *team* role
             role = await get_team_role(team_name, self.guild, self.reason)

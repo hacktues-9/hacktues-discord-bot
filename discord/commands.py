@@ -230,3 +230,42 @@ class Commands(commands.Cog):
                 #         await role.edit(mentionable=True)
                 
         await ctx.send("update_mentors done!");
+
+    @commands.has_role('Организатор')
+    @commands.command(aliases=["printmentors"])
+    async def print_mentors(self, ctx):
+        for member in ctx.guild.members:
+            role = discord.utils.get(ctx.guild.roles, name="Ментор")
+            # Get mentors
+            if role in member.roles:
+                if member.nick:
+                    name = member.nick
+                else:
+                    name = member.name
+                
+                print(name)
+        # get all teams
+        
+        # go though all teams
+
+            # convert the team name
+
+            # search for team name
+
+            # if no result => print
+
+    # @commands.command(aliases=["updatementorrole"])
+    # async def update_channels(self, ctx):
+    #     channels = ctx.guild.voice_channels
+    #     count = 0
+    #     for channel in channels:
+    #         if channel.name.startswith('team'):
+    #             print("Fetching",channel)
+    #             role = discord.utils.get(ctx.guild.roles, name="Ментор Оценител")
+    #             await channel.set_permissions(role, send_messages=True, view_channel=True)
+    #             count += 1
+
+    #     print(count)
+    
+
+
