@@ -11,15 +11,6 @@ bot = commands.Bot()
 async def ping(interaction: Interaction):
     await interaction.response.send_message("Pong!")
 
-# stop everyone except IT Gods from using this command
-
-
-@bot.slash_command(guild_ids=[TESTING_GUILD_ID], description="Test command")
-async def test(interaction: Interaction, user: SlashOption(str, description="User to test")):
-    if interaction.author.id not in [123456789, 987654321]:
-        await interaction.response.send_message("You are not allowed to use this command!", ephemeral=True)
-        return
-    await interaction.response.send_message(f"Testing {user}...")
 
 
 @bot.slash_command(guild_ids=[GLOBAL_GUILD_ID], description="Choose a number")
