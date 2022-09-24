@@ -26,6 +26,8 @@ multidict==6.0.2
     #   yarl
 nextcord==2.2.0
     # via -r requirements.in
+python-dotenv==0.21.0
+    # via -r requirements.in
 typing-extensions==4.3.0
     # via nextcord
 yarl==1.8.1
