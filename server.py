@@ -1,7 +1,8 @@
 from nextcord import Interaction, SlashOption
 from nextcord.ext import commands
+import os 
 
-TESTING_GUILD_ID = 995682058049425438  # Replace with your testing guild id
+TOKEN = str(os.getenv('TOKEN'))
 GLOBAL_GUILD_ID = 995681969478312066  # Replace with your global guild id
 bot = commands.Bot()
 
@@ -10,7 +11,6 @@ bot = commands.Bot()
 @bot.slash_command(guild_ids=[GLOBAL_GUILD_ID], description="Ping command")
 async def ping(interaction: Interaction):
     await interaction.response.send_message("Pong!")
-
 
 
 @bot.slash_command(guild_ids=[GLOBAL_GUILD_ID], description="Choose a number")
@@ -23,4 +23,4 @@ async def enter_a_number(
     else:
         await interaction.response.send_message(f"You chose {number}!")
 
-bot.run("MTAwOTU0NzYyMzYzNzcxMjk3Nw.GV4Syx.8kkk8zemsg4VXJ-zV2bxDHoHjxbFtzvQgTewEg")
+bot.run(TOKEN)

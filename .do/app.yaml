@@ -1,0 +1,8 @@
+name: hacktues-discord-bot
+services:
+  - environment_slug: python
+    github:
+      branch: main
+      deploy_on_push: true
+      repo: hacktues-9/hacktues-discord-bot
+    name: hacktues-discord-bot
