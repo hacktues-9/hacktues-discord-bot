@@ -20,7 +20,7 @@ async def ticket_sys(interaction: Interaction, problem: str, bot: commands.Bot):
                 ticket = await log_channel.send(f"{available_mentor.mention},help {role.mention} with: \n{problem}")
 
                 def check_ticket(r, u):
-                    return (str(r) == "🎟️" and u != bot.user and (available_mentor in u.roles))
+                    return (str(r) == "🎟️" and u != bot.user and (available_mentor in u.roles) and (r.message.id == ticket.id))
 
                 while True:
                     await ticket.add_reaction("🎟️")
@@ -34,10 +34,10 @@ async def ticket_sys(interaction: Interaction, problem: str, bot: commands.Bot):
                     await ticket.add_reaction("❌")
 
                     def check_reaction(r, u):
-                        return ((str(r) == "✅" or str(r) == "❌") and (u == assigned_mentor and u != bot.user))
+                        return ((str(r) == "✅" or str(r) == "❌") and (u == assigned_mentor and u != bot.user) and (r.message.id == ticket.id))
 
                     def check_confirmation(r, u):
-                        return((str(r) == "✅" or str(r) == "❌") and (role in u.roles) and (u != bot.user))
+                        return((str(r) == "✅" or str(r) == "❌") and (role in u.roles) and (u != bot.user) and (r.message.id == confirmation.id))
 
                     await interaction.channel.send(f"{assigned_mentor.name} has been assigned for your problem")
 
