@@ -54,6 +54,7 @@ roles = {}
 
 @bot.event
 async def on_ready():
+
     guild = bot.get_guild(GLOBAL_GUILD_ID)
 
     print(
@@ -108,17 +109,60 @@ async def on_member_join(member):
 # command will be global if guild_ids is not specified
 @bot.slash_command(guild_ids=[GLOBAL_GUILD_ID], description="Ping command")
 async def ping(interaction: Interaction):
-    await interaction.response.send_message("Pong!")
+    await interaction.response.send_message(f"🏓Pong! ({bot.latency*1000}ms)")
 
+@bot.slash_command(guild_ids=[GLOBAL_GUILD_ID], description="Motivate command")
+async def motivate(interaction: Interaction):
+    await interaction.response.send_message("You can do it!")
 
-@bot.slash_command(guild_ids=[GLOBAL_GUILD_ID], description="Choose a number")
-async def enter_a_number(
-    interaction: Interaction,
-    number: int = SlashOption(description="Your number", required=False),
-):
-    if not number:
-        await interaction.response.send_message("No number was specified!", ephemeral=True)
+@bot.slash_command(guild_ids=[GLOBAL_GUILD_ID], description="Ticket command") # problem, and channel
+async def problem(interaction: Interaction, problem: str = SlashOption(description="What is your problem?", required=True)):
+    channel = interaction.channel
+    roles = interaction.user.roles
+    if "team" in channel.name:
+        for role in roles:
+            if "team" in role.name:
+
+                def check_ticket(r, u):
+                    return (str(r) == "🎟️" and u != bot.user)
+
+                await interaction.response.send_message(f"Your problem has been sent to the team leaders! {problem}")
+                mentor_role = interaction.guild.get_role(1024417339262910555)
+                log = interaction.guild.get_channel(1024415063655862442)
+                ticket = await log.send(f"{role.name} has a problem: {problem}! {mentor_role.mention} go in {channel.mention} and help them!")
+                while True:
+                    await ticket.add_reaction("🎟️")
+                    _, mentor_user = await bot.wait_for("reaction_add", check=check_ticket)
+                    mentor_user.add_roles(role)
+                    await ticket.clear_reaction("🎟️")
+                    await ticket.add_reaction("✅")
+                    await ticket.add_reaction("❌")
+                    await interaction.channel.send(f"{mentor_user.name} is helping {role.mention} with {problem}!")
+                    claimed = interaction.guild.get_channel(1024426110265589931)
+                    await claimed.send(f"{mentor_user.name} is helping {role.name} with {problem}!")
+                    reaction, _ = await bot.wait_for("reaction_add", check=lambda r, u: (str(r) == "✅" or str(r) == "❌") and u == mentor_user)
+                    await mentor_user.remove_roles(role)
+                    await ticket.clear_reaction("✅")
+                    await ticket.clear_reaction("❌")
+                    if str(reaction) == "✅":
+                        confirmation = await interaction.channel.send(f"{role.mention} your problem has been marked as solved!")
+                        await confirmation.add_reaction("✅")
+                        await confirmation.add_reaction("❌")
+                        reaction, _ = await bot.wait_for("reaction_add", check=lambda r, u: (str(r) == "✅" or str(r) == "❌") and u != bot.user)
+                        if str(reaction) == "✅":
+                            await ticket.delete() 
+                        else:
+                            await confirmation.delete()
+                            await interaction.channel.send(f"{role.mention} your problem has been reopened!")
+                        await confirmation.clear_reaction("✅")
+                        await confirmation.clear_reaction("❌")
+                        break
+                    break 
+        else:
+            await interaction.response.send_message("You are not in a team!")
     else:
-        await interaction.response.send_message(f"You chose {number}!")
+        await interaction.response.send_message("You are not in a team channel!")
+    
 
+    
 bot.run(TOKEN)
