@@ -1,5 +1,5 @@
 from nextcord import Interaction, SlashOption, Intents, AudioSource, FFmpegOpusAudio, VoiceClient
-from nextcord.ext import commands
+from nextcord.ext import commands, application_checks
 import os, sys
 import time
 import asyncio
@@ -25,6 +25,8 @@ user = os.getenv('DB_USER')
 password = os.getenv('DB_PASSWORD')
 database = os.getenv('DB_NAME')
 port = os.getenv('DB_PORT')
+
+roles = {}
 
 user_discord_select = '''
 SELECT 
@@ -59,7 +61,7 @@ conn = psycopg2.connect(
 
 cur = conn.cursor()
 
-roles = {}
+tech = [ "HTML", "C++", "TensorFlow", "Etherium", "JavaScript", "TypeScript", "Angular.js", "Samza", "IOT", "Raspberry Pi", "Rust", "Scala", "Objective C", "Node.js", "Java", "SQLite", "Kubernetes", "Machine Learing", "VR", "C#", "Kotlin", "Vue.js", "MongoDB", "RocksDB", "Perl", "C", "Go", "Flutter", "Flask", "Cassandra", "Arduino", "Docker", "Postgre SQL", "Linux", "Ruby", "Hadoop", "Swift", "Redis", "Python", "Assembler", "MySQL", "InfluxDB", "RDS", "NoSQL", "Django", "PWA", "Embedded", "MapReduce", "CSS", "Pytorch", "PHP", "React.js", "Lua", "R", "AR", "SQL", "Kafka", "Blockchain", "Unity3D" ]
 
 ytdl_format_options = {'format': 'bestaudio',
                        'outtmpl': '%(extractor)s-%(id)s-%(title)s.%(ext)s',
@@ -319,9 +321,8 @@ async def on_ready():
 @bot.event
 async def on_member_join(member):
     print(f"{member} has joined the server")
-    username = member.name
-    discriminator = member.discriminator
-    cur.execute("SELECT * FROM discord WHERE username=%s AND discriminator=%s", (username, discriminator))
+    id = member.id
+    cur.execute("SELECT * FROM discord WHERE discord_user_id=%s", (id,))
     result = cur.fetchone()
 
     if result is None:
@@ -354,7 +355,18 @@ async def on_member_join(member):
             await member.send("You have not verified your ELSYS email. Please check your email to verify it. If you have not received the verification email, please contact us at https://hacktues.bg/contact-us \n After you have verified your email, please rejoin the server at https://discord.gg/9yAbMUCg \n Thank you for your understanding!")
             await member.kick(reason="Have not verified ELSYS email")
             print(f"{member} has been kicked from the server for not verifying their ELSYS email")
-            
+
+@bot.slash_command(guild_ids=GUILD_IDS, description="Check if tech roles are in check")
+@application_checks.has_permissions(administrator=True)
+async def populate(interaction: Interaction):
+    role_names = []
+    for roleKey in roles:
+        role_names.append(roleKey)
+    diff = list(set(tech) - set(role_names))
+    for technology in diff:
+        await interaction.guild.create_role(name=technology)
+    await interaction.response.send_message("Roles have been updated!")
+
 @bot.slash_command(guild_ids=GUILD_IDS, description="Motivate command")
 async def motivate(interaction: Interaction):
     await interaction.response.send_message("https://media.discordapp.net/attachments/809713428490354759/820931975199850516/smert.gif")
