@@ -6,26 +6,22 @@ import asyncio
 import re
 from dotenv import load_dotenv
 import psycopg2
-from slh_commands import ticket_sys
 from typing import Dict, List
 import atexit
 import requests
 import urllib.parse, urllib.request
 import yt_dlp
+sys.path.append('commands\ht_func.py')
+sys.path.append('utils\ht_db.py')
+sys.path.append('utils\ht_global.py')
+import ht_func
+import ht_db
+from ht_global import tech, classes
 
 load_dotenv()
-TOKEN = str(os.getenv('TOKEN'))
-GUILD_IDS = [int(os.getenv('GUILD_ID1')), int(os.getenv('GUILD_ID2'))]
 intents = Intents.default()
 intents.members = True
 bot = commands.Bot(intents=intents)
-
-host = os.getenv('DB_HOST')
-user = os.getenv('DB_USER')
-password = os.getenv('DB_PASSWORD')
-database = os.getenv('DB_NAME')
-port = os.getenv('DB_PORT')
-
 roles = {}
 
 user_discord_select = '''
@@ -49,19 +45,9 @@ JOIN discord
 WHERE username = %s AND discriminator = %s
 '''
 
-classes = ['А','Б','В','Г',]
 
-conn = psycopg2.connect(
-    host=host,
-    user=user,
-    password=password,
-    database=database,
-    port=port
-)
 
-cur = conn.cursor()
-
-tech = [ "HTML", "C++", "TensorFlow", "Etherium", "JavaScript", "TypeScript", "Angular.js", "Samza", "IOT", "Raspberry Pi", "Rust", "Scala", "Objective C", "Node.js", "Java", "SQLite", "Kubernetes", "Machine Learing", "VR", "C#", "Kotlin", "Vue.js", "MongoDB", "RocksDB", "Perl", "C", "Go", "Flutter", "Flask", "Cassandra", "Arduino", "Docker", "Postgre SQL", "Linux", "Ruby", "Hadoop", "Swift", "Redis", "Python", "Assembler", "MySQL", "InfluxDB", "RDS", "NoSQL", "Django", "PWA", "Embedded", "MapReduce", "CSS", "Pytorch", "PHP", "React.js", "Lua", "R", "AR", "SQL", "Kafka", "Blockchain", "Unity3D" ]
+cur, conn = ht_db.connect()
 
 ytdl_format_options = {'format': 'bestaudio',
                        'outtmpl': '%(extractor)s-%(id)s-%(title)s.%(ext)s',
@@ -126,7 +112,7 @@ class ServerSession:
 
     async def start_playing(self, ctx):
         self.voice_client.play(self.queue[0].audio_source, after=lambda e=None: self.after_playing(ctx, e))
-        await ctx.response.send_message(f'Now playing: {self.queue[0].title}')
+        await ctx.channel.send(f'Now playing: {self.queue[0].title}')
 
     async def after_playing(self, ctx, error):
         if error:
@@ -373,6 +359,6 @@ async def motivate(interaction: Interaction):
 
 @bot.slash_command(guild_ids=GUILD_IDS, description="Ticket command")
 async def problem(interaction: Interaction, problem: str = SlashOption(description="What's your problem?", required=True)):
-    await ticket_sys(interaction, problem, bot)
+    await ht_func.ticket_sys(interaction, problem, bot)
 
 bot.run(TOKEN)
