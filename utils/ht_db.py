@@ -1,4 +1,7 @@
 import psycopg2
+import os
+from dotenv import load_dotenv
+load_dotenv()
 
 host = os.getenv('DB_HOST')
 user = os.getenv('DB_USER')
@@ -17,3 +20,15 @@ async def connect():
 
     cur = conn.cursor()
     return cur, conn
+
+async def get_techs():
+    cur, conn = await connect()
+    cur.execute("SELECT technology FROM technologies")
+    techs = cur.fetchall()
+    reformat = []
+    for tech in techs:
+        reformat.append(tech[0])
+    techs = reformat
+    cur.close()
+    conn.close()
+    return techs

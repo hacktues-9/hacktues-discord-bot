@@ -2,6 +2,7 @@ from nextcord import Interaction
 from nextcord.ext import commands
 
 async def ticket_sys(interaction: Interaction, problem: str, bot: commands.Bot):
+    await interaction.response.defer()
     channel = interaction.channel
     roles = interaction.user.roles
     guild = interaction.guild
@@ -9,7 +10,7 @@ async def ticket_sys(interaction: Interaction, problem: str, bot: commands.Bot):
     if "team" in channel.name:
         for role in roles:
             if "team" in role.name:
-                await interaction.response.send_message(f"Your problem has been sent to the mentors")
+                await interaction.followup.send(f"Your problem has been sent to the mentors")
 
                 available_mentor = guild.get_role(1024553918795091998)
                 claimed_mentor = guild.get_role(1024554391887413328)
