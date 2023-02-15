@@ -242,17 +242,17 @@ async def create_teams(interaction: Interaction):
     cur, conn = await ht_db.connect()
     cur.execute("SELECT name FROM teams")
     teams = cur.fetchall()
-    team_ids = []
     category_ids = {}
-    cur.close()
-    conn.close()
+    print(teams)
 
     # create the roles for each team
     for team in teams:
+        print(f"Creating role = Team {team[0]}")
         roles[f"Team {team[0]}"] = await guild.create_role(name=f"Team {team[0]}")
-
+    
     # create the categories for each team
     for team in teams:
+        print(f"Creating category = TEAM {team[0].upper()}")
         # await guild.create_category(f"TEAM {team[1].upper()}")
         category = await guild.create_category(f"TEAM {team[0].upper()}", overwrites={
             guild.default_role: PermissionOverwrite(read_messages=False),
@@ -262,18 +262,16 @@ async def create_teams(interaction: Interaction):
 
     # create the channels for each team
     for team in teams:
+        print(f"Creating channel = team-{team[1].lower()}")
         category = guild.get_channel(category_ids[team[0]])
         await guild.create_text_channel(f"team-{team[1].lower()}", category=category)
         await guild.create_voice_channel(f"team-{team[1].lower()}", category=category)
 
     await interaction.followup.send("Teams have been created!")
 
-@load.error
-async def load_error(interaction: Interaction, error):
-    if isinstance(error, SlashCommandError):
-        await interaction.response.send_message(f"An error occurred: {error}", ephemeral=True)
-    else:
-        raise error
+    
+    cur.close()
+    conn.close()
 
 
 bot.run(TOKEN)
