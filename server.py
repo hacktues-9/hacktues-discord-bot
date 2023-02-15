@@ -1,6 +1,10 @@
+from ht_global import classes, GUILD_IDS, TOKEN
+import ht_db
+import ht_func
 from nextcord import Interaction, SlashOption, Intents, AudioSource, FFmpegOpusAudio, VoiceClient
 from nextcord.ext import commands, application_checks
-import os, sys
+import os
+import sys
 import time
 import asyncio
 import re
@@ -9,13 +13,11 @@ import psycopg2
 from typing import Dict, List
 import atexit
 import requests
-import urllib.parse, urllib.request
+import urllib.parse
+import urllib.request
 import yt_dlp
 sys.path.append('./commands')
 sys.path.append('./utils')
-import ht_func
-import ht_db
-from ht_global import classes, GUILD_IDS, TOKEN
 
 load_dotenv()
 intents = Intents.default()
@@ -56,13 +58,15 @@ async def on_ready():
     for role in await guild.fetch_roles():
         roles[role.name] = role
 
+
 @bot.event
 async def on_member_join(member):
     print(f"{member} has joined the server")
     # id = member.id as a string
     id = str(member.id)
     cur, conn = await ht_db.connect()
-    cur.execute("SELECT username, discriminator FROM discord WHERE discord_user_id=%s", (id,))
+    cur.execute(
+        "SELECT username, discriminator FROM discord WHERE discord_user_id=%s", (id,))
     result = cur.fetchone()
 
     if result is None:
@@ -85,7 +89,7 @@ async def on_member_join(member):
         team_id = result[6]
 
         if elsys_email_verified:
-            await member.edit(nick = f"{name} {grade}({class_value})")
+            await member.edit(nick=f"{name} {grade}({class_value})")
             await member.add_roles(roles["Участник"])
             # if role id = 2, add role "Капитан"
             if role_id == 2:
@@ -103,11 +107,13 @@ async def on_member_join(member):
                     roles[f"Team {team_name}"] = await guild.create_role(name=f"Team {team_name}")
                     await member.add_roles(roles[f"Team {team_name}"])
 
-            cur.execute("SELECT technologies_id FROM user_technologies WHERE user_id=%s", (user_id,))
+            cur.execute(
+                "SELECT technologies_id FROM user_technologies WHERE user_id=%s", (user_id,))
             result = cur.fetchall()
             for techId in result:
                 technology = str(techId[0])
-                cur.execute("SELECT technology FROM technologies WHERE id=%s", (technology,))
+                cur.execute(
+                    "SELECT technology FROM technologies WHERE id=%s", (technology,))
                 result = cur.fetchone()
                 await member.add_roles(roles[result[0]])
             # await member.send(f"Welcome to HackTues Discord server, {first_name} {last_name}! \n You have been verified and your roles have been assigned. \n If you have any questions, please contact us at https://hacktues.bg/contact-us \n Thank you for your understanding!")
@@ -117,10 +123,12 @@ async def on_member_join(member):
             # await member.send("You have not verified your ELSYS email. Please check your email to verify it. If you have not received the verification email, please contact us at https://hacktues.bg/contact-us \n After you have verified your email, please rejoin the server at https://discord.gg/9yAbMUCg \n Thank you for your understanding!")
             await member.send(f"Здравейте, {name}! \n Не сте верифицирали своя ELSYS имейл. Моля, проверете своя имейл, за да го верифицирате. Ако не сте получили имейла за верификация, моля, свържете се с нас на https://hacktues.bg/contact-us . \n Ако не сте се регистрирали, може да го направите на https://hacktues.bg/signup \n След като сте верифицирали своя имейл, моля, влезте отново в сървъра на https://discord.gg/UqFRDF6RcN \n Благодарим за разбирането!")
             await member.kick(reason="Have not verified ELSYS email")
-            print(f"{member} has been kicked from the server for not verifying their ELSYS email")
+            print(
+                f"{member} has been kicked from the server for not verifying their ELSYS email")
 
     cur.close()
     conn.close()
+
 
 @bot.slash_command(guild_ids=GUILD_IDS, description="Check if tech roles are in check")
 @application_checks.has_permissions(administrator=True)
@@ -128,13 +136,13 @@ async def populate(interaction: Interaction):
     await interaction.response.defer()
     tech = await ht_db.get_techs()
 
-    #create roles
+    # create roles
     for roleKey in tech:
         role = await interaction.guild.create_role(name=roleKey)
         roles[roleKey] = role
 
     await interaction.followup.send("Roles created")
-        
+
 
 @bot.slash_command(guild_ids=GUILD_IDS, description="Check if tech roles are in check")
 @application_checks.has_permissions(administrator=True)
@@ -146,24 +154,29 @@ async def check(interaction: Interaction):
     diff = list(set(tech) - set(role_names))
     await interaction.followup.send(f"Missing roles: {diff}")
 
+
 @bot.slash_command(guild_ids=GUILD_IDS, description="Drop roles from tech roles")
 @application_checks.has_permissions(administrator=True)
 async def drop(interaction: Interaction):
     await interaction.response.defer()
-    nonTechRoles = ['admin', 'Hack Tues 9 Dev', 'Организатори', 'mentor', 'available-mentor', 'claimed-mentor', '@everyone']
+    nonTechRoles = ['admin', 'Hack Tues 9 Dev', 'Организатори',
+                    'mentor', 'available-mentor', 'claimed-mentor', '@everyone']
     for roleKey in roles:
         if roleKey not in nonTechRoles:
             print(roleKey)
             await roles[roleKey].delete()
     await interaction.followup.send("Roles have been dropped!")
 
+
 @bot.slash_command(guild_ids=GUILD_IDS, description="Motivate command")
 async def motivate(interaction: Interaction):
     await interaction.response.send_message("https://media.discordapp.net/attachments/809713428490354759/820931975199850516/smert.gif")
 
+
 @bot.slash_command(guild_ids=GUILD_IDS, description="Ticket command")
 async def problem(interaction: Interaction, problem: str = SlashOption(description="What's your problem?", required=True)):
     await ht_func.ticket_sys(interaction, problem, bot)
+
 
 @bot.slash_command(guild_ids=GUILD_IDS, description="Reload roles")
 async def reload(interaction: Interaction):
@@ -184,7 +197,7 @@ async def reload(interaction: Interaction):
     team_id = result[6]
     await interaction.response.defer()
     if elsys_email_verified:
-        await member.edit(nick = f"{name} {grade}({class_value})")
+        await member.edit(nick=f"{name} {grade}({class_value})")
         await member.add_roles(roles["Участник"])
         # if role id = 2, add role "Капитан"
         if role_id == 2:
@@ -203,13 +216,53 @@ async def reload(interaction: Interaction):
                 roles[f"Team {team_name}"] = await guild.create_role(name=f"Team {team_name}")
                 await member.add_roles(roles[f"Team {team_name}"])
 
-        cur.execute("SELECT technologies_id FROM user_technologies WHERE user_id=%s", (user_id,))
+        cur.execute(
+            "SELECT technologies_id FROM user_technologies WHERE user_id=%s", (user_id,))
         result = cur.fetchall()
         for techId in result:
             technology = str(techId[0])
-            cur.execute("SELECT technology FROM technologies WHERE id=%s", (technology,))
+            cur.execute(
+                "SELECT technology FROM technologies WHERE id=%s", (technology,))
             result = cur.fetchone()
             await member.add_roles(roles[result[0]])
         await interaction.followup.send("Roles have been reloaded!")
+
+
+@bot.slash_command(guild_ids=GUILD_IDS, description="Create Teams")
+@application_checks.has_permissions(administrator=True)
+async def create_teams(interaction: Interaction):
+    # go through the list of teams and create a role for each one
+    # then create a category for each team and a channel for each team in that category and a voice channel for each team in that category as well
+    # then create a role for each team and give it the permissions to view the channels in the category
+    # then give the team role to all the members in the team
+
+    await interaction.response.defer()
+    guild = interaction.guild
+    # get the list of teams from the database
+    cur, conn = await ht_db.connect()
+    await cur.execute("SELECT name FROM teams")
+    teams = await cur.fetchall()
+    team_ids = []
+    cur.close()
+    conn.close()
+
+    # create the roles for each team
+    for team in teams:
+        await guild.create_role(name=team[1], mentionable=True)
+
+    # create the categories for each team
+    for team in teams:
+        # await guild.create_category(f"TEAM {team[1].upper()}")
+        await guild.create_category(f"TEAM {team[0].upper()}", overwrites={
+            guild.default_role: discord.PermissionOverwrite(read_messages=False),
+            guild.get_role(team[0]): discord.PermissionOverwrite(read_messages=True)
+        })
+
+    # # create the channels for each team
+    # for team in teams:
+    #     category = guild.get_channel(int(team[0]))
+    #     await guild.create_text_channel(f"team-{team[1].lower()}", category=category)
+    #     await guild.create_voice_channel(f"team-{team[1].lower()}", category=category)
+
 
 bot.run(TOKEN)
