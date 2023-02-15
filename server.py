@@ -248,7 +248,7 @@ async def create_teams(interaction: Interaction):
 
     # create the roles for each team
     for team in teams:
-        await guild.create_role(name=team[1], mentionable=True)
+        await guild.create_role(name=team[0], mentionable=True)
 
     # create the categories for each team
     for team in teams:
