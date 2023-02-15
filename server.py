@@ -248,14 +248,14 @@ async def create_teams(interaction: Interaction):
 
     # create the roles for each team
     for team in teams:
-        await guild.create_role(name=team[0], mentionable=True)
+        roles[team[0]] = await guild.create_role(name=team[0])
 
     # create the categories for each team
     for team in teams:
         # await guild.create_category(f"TEAM {team[1].upper()}")
         await guild.create_category(f"TEAM {team[0].upper()}", overwrites={
             guild.default_role: discord.PermissionOverwrite(read_messages=False),
-            guild.get_role(team[0]): discord.PermissionOverwrite(read_messages=True)
+            roles[team[0]]: discord.PermissionOverwrite(read_messages=True)
         })
 
     # # create the channels for each team
