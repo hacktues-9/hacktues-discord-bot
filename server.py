@@ -254,8 +254,8 @@ async def create_teams(interaction: Interaction):
     for team in teams:
         # await guild.create_category(f"TEAM {team[1].upper()}")
         await guild.create_category(f"TEAM {team[0].upper()}", overwrites={
-            guild.default_role: discord.PermissionOverwrite(read_messages=False),
-            roles[team[0]]: discord.PermissionOverwrite(read_messages=True)
+            guild.default_role: nextcord.PermissionOverwrite(read_messages=False),
+            roles[team[0]]: nextcord.PermissionOverwrite(read_messages=True)
         })
 
     # # create the channels for each team
