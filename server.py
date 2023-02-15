@@ -1,6 +1,3 @@
-from ht_global import classes, GUILD_IDS, TOKEN
-import ht_db
-import ht_func
 from nextcord import Interaction, SlashOption, Intents, AudioSource, FFmpegOpusAudio, VoiceClient
 from nextcord.ext import commands, application_checks
 import os
@@ -18,6 +15,9 @@ import urllib.request
 import yt_dlp
 sys.path.append('./commands')
 sys.path.append('./utils')
+from ht_global import classes, GUILD_IDS, TOKEN
+import ht_db
+import ht_func
 
 load_dotenv()
 intents = Intents.default()
