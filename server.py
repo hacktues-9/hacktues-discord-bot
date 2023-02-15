@@ -266,5 +266,7 @@ async def create_teams(interaction: Interaction):
         await guild.create_text_channel(f"team-{team[1].lower()}", category=category)
         await guild.create_voice_channel(f"team-{team[1].lower()}", category=category)
 
+    await interaction.followup.send("Teams have been created!")
+
 
 bot.run(TOKEN)
