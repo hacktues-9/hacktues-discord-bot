@@ -129,6 +129,10 @@ async def on_member_join(member):
     cur.close()
     conn.close()
 
+@bot.slash_command(guild_ids=GUILD_IDS, description="Ping the bot")
+async def ping(interaction: Interaction):
+    await interaction.response.send_message("Pong!")
+
 
 @bot.slash_command(guild_ids=GUILD_IDS, description="Check if tech roles are in check")
 @application_checks.has_permissions(administrator=True)
@@ -236,8 +240,8 @@ async def create_teams(interaction: Interaction):
     # then create a role for each team and give it the permissions to view the channels in the category
     # then give the team role to all the members in the team
 
-    await interaction.response.defer()
     guild = interaction.guild
+    await interaction.response.defer()
     # get the list of teams from the database
     cur, conn = await ht_db.connect()
     cur.execute("SELECT name FROM teams")
@@ -247,8 +251,9 @@ async def create_teams(interaction: Interaction):
 
     # create the roles for each team
     for team in teams:
-        print(f"Creating role = Team {team[0]}")
-        roles[f"Team {team[0]}"] = await guild.create_role(name=f"Team {team[0]}")
+        if f"Team {team[0]}" not in roles:
+            print(f"Creating role = Team {team[0]}")
+            roles[f"Team {team[0]}"] = await guild.create_role(name=f"Team {team[0]}")
     
     # create the categories for each team
     for team in teams:
@@ -262,16 +267,55 @@ async def create_teams(interaction: Interaction):
 
     # create the channels for each team
     for team in teams:
-        print(f"Creating channel = team-{team[1].lower()}")
+        print(f"Creating channel = team-{team[0].lower()}")
         category = guild.get_channel(category_ids[team[0]])
-        await guild.create_text_channel(f"team-{team[1].lower()}", category=category)
-        await guild.create_voice_channel(f"team-{team[1].lower()}", category=category)
+        await guild.create_text_channel(f"team-{team[0].lower()}", category=category)
+        await guild.create_voice_channel(f"team-{team[0].lower()}", category=category)
 
     await interaction.followup.send("Teams have been created!")
 
     
     cur.close()
     conn.close()
+
+@bot.slash_command(guild_ids=GUILD_IDS, description="Delete Teams")
+@application_checks.has_permissions(administrator=True)
+async def delete_teams(interaction: Interaction):
+    # delete roles with "Team" in the name
+    # delete categories with "TEAM" in the name
+
+    guild = interaction.guild
+    await interaction.response.defer()
+    # get the list of teams from the database
+    cur, conn = await ht_db.connect()
+    cur.execute("SELECT name FROM teams")
+    teams = cur.fetchall()
+    category_ids = {}
+    print(teams)
+
+    # delete the roles for each team
+    for team in teams:
+        if f"Team {team[0]}" in roles:
+            print(f"Deleting role = Team {team[0]}")
+            await roles[f"Team {team[0]}"].delete()
+            del roles[f"Team {team[0]}"]
+
+    # get the category ids for each team
+    for team in teams:
+        # get channel with name "TEAM <team name>"
+        for channel in guild.channels:
+            if channel.name == f"TEAM {team[0].upper()}":
+                category_ids[team[0]] = channel.id
+
+    # delete the categories for each team
+    for team in teams:
+        print(f"Deleting category = TEAM {team[0].upper()}")
+        if team[0] in category_ids:
+            category = guild.get_channel(category_ids[team[0]])
+            await category.delete()
+
+    await interaction.followup.send("Teams have been deleted!")
+
 
 
 bot.run(TOKEN)
