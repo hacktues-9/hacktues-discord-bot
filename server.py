@@ -243,26 +243,28 @@ async def create_teams(interaction: Interaction):
     cur.execute("SELECT name FROM teams")
     teams = cur.fetchall()
     team_ids = []
+    category_ids = {}
     cur.close()
     conn.close()
 
     # create the roles for each team
     for team in teams:
-        roles[team[0]] = await guild.create_role(name=team[0])
+        roles[f"Team {team[0]}"] = await guild.create_role(name=f"Team {team[0]}")
 
     # create the categories for each team
     for team in teams:
         # await guild.create_category(f"TEAM {team[1].upper()}")
-        await guild.create_category(f"TEAM {team[0].upper()}", overwrites={
+        category = await guild.create_category(f"TEAM {team[0].upper()}", overwrites={
             guild.default_role: PermissionOverwrite(read_messages=False),
-            roles[team[0]]: PermissionOverwrite(read_messages=True)
+            roles[f"Team {team[0]}"]: PermissionOverwrite(read_messages=True)
         })
+        category_ids[team[0]] = category.id
 
-    # # create the channels for each team
-    # for team in teams:
-    #     category = guild.get_channel(int(team[0]))
-    #     await guild.create_text_channel(f"team-{team[1].lower()}", category=category)
-    #     await guild.create_voice_channel(f"team-{team[1].lower()}", category=category)
+    # create the channels for each team
+    for team in teams:
+        category = guild.get_channel(category_ids[team[0]])
+        await guild.create_text_channel(f"team-{team[1].lower()}", category=category)
+        await guild.create_voice_channel(f"team-{team[1].lower()}", category=category)
 
 
 bot.run(TOKEN)
