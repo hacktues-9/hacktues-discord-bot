@@ -240,8 +240,8 @@ async def create_teams(interaction: Interaction):
     guild = interaction.guild
     # get the list of teams from the database
     cur, conn = await ht_db.connect()
-    await cur.execute("SELECT name FROM teams")
-    teams = await cur.fetchall()
+    cur.execute("SELECT name FROM teams")
+    teams = cur.fetchall()
     team_ids = []
     cur.close()
     conn.close()
