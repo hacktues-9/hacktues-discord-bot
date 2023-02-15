@@ -268,5 +268,12 @@ async def create_teams(interaction: Interaction):
 
     await interaction.followup.send("Teams have been created!")
 
+@load.error
+async def load_error(interaction: Interaction, error):
+    if isinstance(error, SlashCommandError):
+        await interaction.response.send_message(f"An error occurred: {error}", ephemeral=True)
+    else:
+        raise error
+
 
 bot.run(TOKEN)
