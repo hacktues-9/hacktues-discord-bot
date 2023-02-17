@@ -130,10 +130,10 @@ class EmbedModal(nextcord.ui.Modal):
             user = get_mentor(mail)
             if user is None:
                 return await interaction.response.send_message("Няма потребител с този email", ephemeral=True)
-            if user[5] is not None:
+            if user[14] is not None:
                 return await interaction.response.send_message("Вече сте свързан с друг дискорд акаунт", ephemeral=True)
-            verification_code = user[4]
-            name = user[2]
+            verification_code = user[18]
+            name = user[4] + " " + user[5]
             print(verification_code)
             send_email(name, mail, verification_code)
             # return await interaction.response.send_message(f"Име: {fname} \nФамилия: {lname} \nИмейл: {mail}", ephemeral=True)
@@ -150,7 +150,7 @@ class EmbedModal(nextcord.ui.Modal):
             await member.add_roles(1072702941603037285)
             await member.add_roles(1024553918795091998)
             await member.remove_roles(roles["Unverified"])
-            await member.edit(nick=user[2])
+            await member.edit(nick=user[4] + " " + user[5])
             return await interaction.response.send_message("Успешно верифициран", ephemeral=True)
 
         # return await interaction.response.send_message("Този бот е изключен за момента.", ephemeral=True)
