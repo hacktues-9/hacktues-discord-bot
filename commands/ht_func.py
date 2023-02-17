@@ -3,7 +3,7 @@ import nextcord
 from nextcord.ext import commands
 import sys
 sys.path.append('./utils')
-from ht_db import get_mentor, get_mentor_techs
+from ht_db import get_mentor, get_mentor_techs, mentor_verify
 import smtplib, ssl
 from dotenv import load_dotenv
 import os
