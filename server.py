@@ -341,6 +341,8 @@ async def mentor_verify(interaction: Interaction):
     await interaction.response.send_modal(modal)
     await modal.wait()
 
+@bot.slash_command(guild_ids=GUILD_IDS, description="Mentor code")
+@application_checks.has_role("Unverified")
 async def mentor_code(interaction: Interaction):
     # await interaction.response.defer()
     member = interaction.user
