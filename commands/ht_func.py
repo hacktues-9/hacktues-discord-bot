@@ -127,7 +127,7 @@ class EmbedModal(nextcord.ui.Modal):
 
         if self.modalV == "register":
             mail = self.emMail.value
-            user = get_mentor(mail)
+            user = await get_mentor(mail)
             print(user)
             if user is None:
                 return await interaction.response.send_message("Няма потребител с този email", ephemeral=True)
@@ -142,7 +142,8 @@ class EmbedModal(nextcord.ui.Modal):
             return await interaction.response.send_message("Изпратихме ви код за верификация на имейла \n когато получите кода моля използвайте командата : /mentor_code", ephemeral=True)
         elif self.modalV == "verification":
             code = self.emCode.value
-            user, u_roles = verify_user(code)
+            user_discord_id = interaction.user.id
+            user, u_roles = verify_mentor(code, user_discord_id)
             if user is None:
                 return await interaction.response.send_message("Невалиден код или потребителят е верифициран", ephemeral=True)
             member = interaction.user
