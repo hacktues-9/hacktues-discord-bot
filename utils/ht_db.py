@@ -1,6 +1,8 @@
-import psycopg2
 import os
+
+import psycopg2
 from dotenv import load_dotenv
+
 load_dotenv()
 
 host = os.getenv('DB_HOST')
@@ -63,7 +65,7 @@ async def verify_mentor(code, discord_id):
     cur.execute("SELECT id FROM discord WHERE discord_user_id = %s", (discord_id,))
     discord_id = cur.fetchone()
     if user and discord_id:
-        cur.execute("UPDATE mentors SET discord_id = %s WHERE verification_code = %s", (discord_id, code))
+        cur.execute("UPDATE mentors SET discord_id = %s WHERE ver_code = %s", (discord_id, code))
         conn.commit()
         techs = get_mentor_techs(user[0])
         cur.close()
