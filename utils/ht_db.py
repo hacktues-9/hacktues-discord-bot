@@ -60,7 +60,7 @@ async def get_mentor_techs(mentor_id):
 
 async def verify_mentor(code, discord_id):
     cur, conn = await connect()
-    cur.execute("SELECT * FROM mentors WHERE verification_code = %s AND discord_id IS NULL", (code,))
+    cur.execute("SELECT * FROM mentors WHERE ver_code = %s AND discord_id IS NULL", (code,))
     user = cur.fetchone()
     cur.execute("SELECT id FROM discord WHERE discord_user_id = %s", (discord_id,))
     discord_id = cur.fetchone()
