@@ -68,7 +68,7 @@ async def on_member_join(member):
     cur.execute(
         "SELECT username, discriminator FROM discord WHERE discord_user_id=%s", (id,))
     result = cur.fetchone()
-
+    
     if result is None:
         # await member.send("You have not registered your Discord account to related HackTues account. Please do so at https://hacktues.bg/ \n If you have already registered your account, please contact us at https://hacktues.bg/contact-us \n After you have registered your account, please rejoin the server at https://discord.gg/9yAbMUCg \n Thank you for your understanding!")
         await member.send("Здравейте, {member.mention}! \n Не сте регистрирали своя Discord акаунт към своя HackTues акаунт. Моля, направете го на https://hacktues.bg/ \n Ако сте регистрирали своя акаунт, моля, свържете се с нас на https://hacktues.bg/contact-us \n След като сте регистрирали своя акаунт, моля, влезте отново в сървъра на https://discord.gg/UqFRDF6RcN \n Благодарим за разбирането!")
@@ -80,6 +80,11 @@ async def on_member_join(member):
         discriminator = result[1]
         cur.execute(user_discord_select, (username, discriminator))
         result = cur.fetchone()
+
+        if result is None:
+            #give user "Unverified" role
+            await member.add_roles(roles["Unverified"])
+
         name = result[0]
         class_value = classes[int(result[1]) - 1]
         grade = result[2]
@@ -315,6 +320,30 @@ async def delete_teams(interaction: Interaction):
             await category.delete()
 
     await interaction.followup.send("Teams have been deleted!")
+
+@bot.slash_command(guild_ids=GUILD_IDS, description="Verification Message")
+@application_checks.has_permissions(administrator=True)
+async def verification_message(interaction: Interaction):
+    await interaction.response.defer()
+    await interaction.followup.send("Please send the verification message in the next 30 seconds")
+    await interaction.send("Здравейте, ако сте Ментор, моля използвайте командата /mentor_verify, благодарим!")
+
+@bot.slash_command(guild_ids=GUILD_IDS, description="Mentor Verification")
+@application_checks.has_role("Unverified")
+async def mentor_verify(interaction: Interaction):
+    await interaction.response.defer()
+    member = interaction.user
+    modal = ht_func.EmbedModal()
+    await interaction.response.send_modal(modal)
+    await modal.wait()
+
+async def mentor_code(interaction: Interaction):
+    await interaction.response.defer()
+    member = interaction.user
+    modal = ht_func.EmbedModal()
+    modal.change_modal()
+    await interaction.response.send_modal(modal)
+    await modal.wait()
 
 
 

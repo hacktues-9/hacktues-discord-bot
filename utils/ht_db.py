@@ -32,3 +32,44 @@ async def get_techs():
     cur.close()
     conn.close()
     return techs
+
+async def get_mentor(email):
+    cur, conn = await connect()
+    cur.execute("SELECT * FROM mentors WHERE email = %s", (email,))
+    user = cur.fetchone()
+    cur.close()
+    conn.close()
+    return user
+
+async def get_mentor_techs(mentor_id):
+    cur, conn = await connect()
+    cur.execute("SELECT technologies_id FROM mentor_technologies WHERE mentor_id = %s", (mentor_id,))
+    techs = cur.fetchall()
+    reformat = []
+    for tech in techs:
+        # get technology by id
+        cur.execute("SELECT technology FROM technologies WHERE id = %s", (tech[0],))
+        tech_name = cur.fetchone()
+        reformat.append(tech_name[0])
+    techs = reformat
+    cur.close()
+    conn.close()
+    return techs
+
+async def verify_mentor(code, discord_id):
+    cur, conn = await connect()
+    cur.execute("SELECT * FROM mentors WHERE verification_code = %s AND discord_id IS NULL", (code,))
+    user = cur.fetchone()
+    cur.execute("SELECT id FROM discord WHERE discord_user_id = %s", (discord_id,))
+    discord_id = cur.fetchone()
+    if user and discord_id:
+        cur.execute("UPDATE mentors SET discord_id = %s WHERE verification_code = %s", (discord_id, code))
+        conn.commit()
+        techs = get_mentor_techs(user[0])
+        cur.close()
+        conn.close()
+        return user, techs
+        
+    cur.close()
+    conn.close()
+    return None, None
