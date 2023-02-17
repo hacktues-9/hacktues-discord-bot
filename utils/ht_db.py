@@ -67,7 +67,7 @@ async def verify_mentor(code, discord_id):
     if user and discord_id:
         cur.execute("UPDATE mentors SET discord_id = %s WHERE ver_code = %s", (str(discord_id), code))
         conn.commit()
-        techs = get_mentor_techs(user[0])
+        techs = await get_mentor_techs(user[0])
         cur.close()
         conn.close()
         return user, techs
