@@ -156,8 +156,8 @@ class EmbedModal(nextcord.ui.Modal):
                 return await interaction.response.send_message("Невалиден код или потребителят е верифициран", ephemeral=True)
             member = interaction.user
             for role in u_roles:
-                # print(roles)
-                await member.add_roles(roles[role[0]])
+                print("ROLE" + role)
+                await member.add_roles(roles[role])
             
             member_role = guild.get_role(1024553918795091998)
             available_mentor = guild.get_role(1072702941603037285)
