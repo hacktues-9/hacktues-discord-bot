@@ -1,4 +1,5 @@
 from nextcord import Interaction
+import nextcord
 from nextcord.ext import commands
 import sys
 sys.path.append('./utils')
