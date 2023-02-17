@@ -1,12 +1,17 @@
-from nextcord import Interaction
-import nextcord
-from nextcord.ext import commands
 import sys
+
+import nextcord
+from nextcord import Interaction
+from nextcord.ext import commands
+
 sys.path.append('./utils')
-from ht_db import get_mentor, get_mentor_techs, verify_mentor
-import smtplib, ssl
-from dotenv import load_dotenv
 import os
+import smtplib
+import ssl
+
+from dotenv import load_dotenv
+from ht_db import get_mentor, get_mentor_techs, verify_mentor
+
 load_dotenv()
 
 smtp_server = "smtp.gmail.com"
@@ -124,7 +129,10 @@ class EmbedModal(nextcord.ui.Modal):
         self.clear_items()
 
     async def callback(self, interaction: Interaction):
-
+        roles = {}
+        guild = interaction.guild
+        for role in await guild.fetch_roles():
+            roles[role.name] = role
         if self.modalV == "register":
             mail = self.emMail.value
             user = await get_mentor(mail)
@@ -150,8 +158,11 @@ class EmbedModal(nextcord.ui.Modal):
             for role in u_roles:
                 # print(roles)
                 await member.add_roles(roles[role[0]])
-            await member.add_roles(1072702941603037285)
-            await member.add_roles(1024553918795091998)
+            
+            member_role = guild.get_role(1024553918795091998)
+            available_mentor = guild.get_role(1072702941603037285)
+            await member.add_roles(member_role)
+            await member.add_roles(available_mentor)
             await member.remove_roles(roles["Unverified"])
             await member.edit(nick=user[4] + " " + user[5])
             return await interaction.response.send_message("Успешно верифициран", ephemeral=True)
