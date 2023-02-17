@@ -84,6 +84,10 @@ async def on_member_join(member):
         if result is None:
             #give user "Unverified" role
             await member.add_roles(roles["Unverified"])
+            # exit function
+            cur.close()
+            conn.close()
+            return
 
         name = result[0]
         class_value = classes[int(result[1]) - 1]
