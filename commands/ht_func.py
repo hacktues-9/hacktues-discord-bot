@@ -143,7 +143,7 @@ class EmbedModal(nextcord.ui.Modal):
         elif self.modalV == "verification":
             code = self.emCode.value
             user_discord_id = interaction.user.id
-            user, u_roles = verify_mentor(code, user_discord_id)
+            user, u_roles = await verify_mentor(code, user_discord_id)
             if user is None:
                 return await interaction.response.send_message("Невалиден код или потребителят е верифициран", ephemeral=True)
             member = interaction.user
