@@ -331,14 +331,14 @@ async def verification_message(interaction: Interaction):
 @bot.slash_command(guild_ids=GUILD_IDS, description="Mentor Verification")
 @application_checks.has_role("Unverified")
 async def mentor_verify(interaction: Interaction):
-    await interaction.response.defer()
+    # await interaction.response.defer()
     member = interaction.user
     modal = ht_func.EmbedModal()
     await interaction.response.send_modal(modal)
     await modal.wait()
 
 async def mentor_code(interaction: Interaction):
-    await interaction.response.defer()
+    # await interaction.response.defer()
     member = interaction.user
     modal = ht_func.EmbedModal()
     modal.change_modal()
