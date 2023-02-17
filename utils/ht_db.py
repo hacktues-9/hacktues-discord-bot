@@ -62,10 +62,10 @@ async def verify_mentor(code, discord_id):
     cur, conn = await connect()
     cur.execute("SELECT * FROM mentors WHERE ver_code = %s AND discord_id IS NULL", (code,))
     user = cur.fetchone()
-    cur.execute("SELECT id FROM discord WHERE discord_user_id = %s", (discord_id,))
+    cur.execute("SELECT id FROM discord WHERE discord_user_id = %s", (str(discord_id),))
     discord_id = cur.fetchone()
     if user and discord_id:
-        cur.execute("UPDATE mentors SET discord_id = %s WHERE ver_code = %s", (discord_id, code))
+        cur.execute("UPDATE mentors SET discord_id = %s WHERE ver_code = %s", (int(discord_id), code))
         conn.commit()
         techs = get_mentor_techs(user[0])
         cur.close()
