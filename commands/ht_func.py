@@ -128,12 +128,12 @@ class EmbedModal(nextcord.ui.Modal):
         if self.modalV == "register":
             mail = self.emMail.value
             user = get_mentor(mail)
+            print(user)
             if user is None:
                 return await interaction.response.send_message("Няма потребител с този email", ephemeral=True)
-            if user[14] == "":
+            if not user[14]:
                 return await interaction.response.send_message("Вече сте свързан с друг дискорд акаунт", ephemeral=True)
-            else:
-                print(user)
+            
             verification_code = user[18]
             name = user[4] + " " + user[5]
             print(verification_code)
