@@ -149,10 +149,21 @@ async def populate(interaction: Interaction):
     await interaction.response.defer()
     tech = await ht_db.get_techs()
 
-    # create roles
+    # go through roles delete all roles without members 
+    for role in await interaction.guild.fetch_roles():
+        if role.name in tech:
+            if len(role.members) == 0:
+                await role.delete()
+
+    #refresh roles dict
+    roles = {}
+    for role in await interaction.guild.fetch_roles():
+        roles[role.name] = role
+
+    # create roles if not in guild roles
     for roleKey in tech:
-        role = await interaction.guild.create_role(name=roleKey)
-        roles[roleKey] = role
+        if roleKey not in roles:
+            roles[roleKey] = await interaction.guild.create_role(name=roleKey)
 
     await interaction.followup.send("Roles created")
 
