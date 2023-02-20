@@ -348,7 +348,7 @@ async def verification_message(interaction: Interaction):
 async def mentor_verify(interaction: Interaction):
     # await interaction.response.defer()
     member = interaction.user
-    modal = ht_func.EmbedModal()
+    modal = ht_func.MentorModal()
     await interaction.response.send_modal(modal)
     await modal.wait()
 
@@ -357,11 +357,28 @@ async def mentor_verify(interaction: Interaction):
 async def mentor_code(interaction: Interaction):
     # await interaction.response.defer()
     member = interaction.user
-    modal = ht_func.EmbedModal()
+    modal = ht_func.MentorModal()
     modal.change_modal()
     await interaction.response.send_modal(modal)
     await modal.wait()
 
+@bot.slash_command(guild_ids=GUILD_IDS, description="Volunteer Verification")
+@application_checks.has_role("Unverified")
+async def volunteer_verify(interaction: Interaction):
+    # await interaction.response.defer()
+    member = interaction.user
+    modal = ht_func.VolMentor()
+    await interaction.response.send_modal(modal)
+    await modal.wait()
 
+@bot.slash_command(guild_ids=GUILD_IDS, description="Volunteer code")
+@application_checks.has_role("Unverified")
+async def volunteer_code(interaction: Interaction):
+    # await interaction.response.defer()
+    member = interaction.user
+    modal = ht_func.VolMentor()
+    modal.change_modal()
+    await interaction.response.send_modal(modal)
+    await modal.wait()
 
 bot.run(TOKEN)
