@@ -206,7 +206,7 @@ class VolMentor(nextcord.ui.Modal):
             print(verification_code)
             send_email(name, mail, verification_code)
             # return await interaction.response.send_message(f"Име: {fname} \nФамилия: {lname} \nИмейл: {mail}", ephemeral=True)
-            return await interaction.response.send_message("Изпратихме ви код за верификация на имейла \n когато получите кода моля използвайте командата : /mentor_code", ephemeral=True)
+            return await interaction.response.send_message("Изпратихме ви код за верификация на имейла \n когато получите кода моля използвайте командата : /volunteer_code", ephemeral=True)
         elif self.modalV == "verification":
             code = self.emCode.value
             user_discord_id = interaction.user.id
