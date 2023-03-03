@@ -447,7 +447,7 @@ async def get_missing_members(interaction: Interaction):
         class_value = classes[int(member[1]) - 1]
         grade = member[2]
         if f"{name} {grade}({class_value})" not in users:
-            missing_members.append(member[1])
+            missing_members.append(f"{name} {grade}({class_value})")
     await interaction.followup.send(f"Missing members: {missing_members}")
 
     cur.close()
