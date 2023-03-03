@@ -381,4 +381,37 @@ async def volunteer_code(interaction: Interaction):
     await interaction.response.send_modal(modal)
     await modal.wait()
 
+@bot.slash_command(guild_ids=GUILD_IDS, description="Get Missing Members")
+@application_checks.has_permissions(administrator=True)
+async def get_missing_members(interaction: Interaction):
+    # get the list of members from the database
+    # get the list of members from the server
+    # compare the two lists and return the missing members
+
+    await interaction.response.defer()
+    cur, conn = await ht_db.connect()
+    request = """
+    SELECT concat(i.grade, c.name) as class, concat(u.first_name, ' ', u.last_name) as name
+    FROM users as u
+    JOIN info i on u.info_id = i.id
+    JOIN socials s on i.socials_id = s.id
+    JOIN class c on i.class_id = c.id
+    WHERE s.discord_id IS NOT NULL AND u.deleted_at IS NULL AND u.team_id IS NOT NULL AND u.team_id != 1
+    ORDER BY i.grade, c.name, u.first_name, u.last_name;
+    """ 
+    # get the list of members from the server
+    users = []
+    for member in interaction.guild.members:
+        users.append(member.display_name)
+    cur.execute(request)
+    members = cur.fetchall()
+    missing_members = []
+    for member in members:
+        if member[1] not in users:
+            missing_members.append(member[0])
+    await interaction.followup.send(f"Missing members: {missing_members}")
+
+    cur.close()
+    conn.close()
+
 bot.run(TOKEN)
