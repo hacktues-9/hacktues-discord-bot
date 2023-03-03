@@ -222,6 +222,7 @@ async def reload(interaction: Interaction):
     team_id = result[6]
     await interaction.response.defer()
     if elsys_email_verified:
+
         await member.edit(nick=f"{name} {grade}({class_value})")
         await member.add_roles(roles["Участник"])
         # if role id = 2, add role "Капитан"
@@ -382,6 +383,40 @@ async def volunteer_code(interaction: Interaction):
     await interaction.response.send_modal(modal)
     await modal.wait()
 
+@bot.slash_command(guild_ids=GUILD_IDS, description="Fix Member Tech Roles")
+@application_checks.has_permissions(administrator=True)
+async def fix_member_tech_roles(interaction: Interaction):
+    await interaction.response.defer()
+    cur, conn = await ht_db.connect()
+    request = """
+    SELECT concat(u.first_name, ' ', u.last_name) as name, i.class_id, i.grade, u.id
+    FROM users as u
+    JOIN info i on u.info_id = i.id
+    JOIN socials s on i.socials_id = s.id
+    JOIN class c on i.class_id = c.id
+    WHERE s.discord_id IS NOT NULL AND u.deleted_at IS NULL AND u.team_id IS NOT NULL AND u.team_id != 1
+    """
+    cur.execute(request)
+    members = cur.fetchall()
+    users = {member.display_name: member for member in guild.members}
+    for member in members:
+        name = member[0]
+        class_value = classes[int(member[1]) - 1]
+        grade = member[2]
+        user_id = member[3]
+        if users[f"{name} {grade}({class_value})"]:
+            user = users[f"{name} {grade}({class_value})"]
+
+            cur.execute(
+            "SELECT technologies_id FROM user_technologies WHERE user_id=%s", (user_id,))
+            result = cur.fetchall()
+            for techId in result:
+                technology = str(techId[0])
+                cur.execute(
+                    "SELECT technology FROM technologies WHERE id=%s", (technology,))
+                result = cur.fetchone()
+                await member.add_roles(roles[result[0]])
+
 @bot.slash_command(guild_ids=GUILD_IDS, description="Get Missing Members")
 @application_checks.has_permissions(administrator=True)
 async def get_missing_members(interaction: Interaction):
@@ -392,7 +427,7 @@ async def get_missing_members(interaction: Interaction):
     await interaction.response.defer()
     cur, conn = await ht_db.connect()
     request = """
-    SELECT concat(i.grade, c.name) as class, concat(u.first_name, ' ', u.last_name) as name
+    SELECT concat(u.first_name, ' ', u.last_name) as name, i.class_id, i.grade
     FROM users as u
     JOIN info i on u.info_id = i.id
     JOIN socials s on i.socials_id = s.id
@@ -408,8 +443,10 @@ async def get_missing_members(interaction: Interaction):
     members = cur.fetchall()
     missing_members = []
     for member in members:
-        print(member[1])
-        if member[1] not in users:
+        name = member[0]
+        class_value = classes[int(member[1]) - 1]
+        grade = member[2]
+        if f"{name} {grade}({class_value})" not in users:
             missing_members.append(member[1])
     await interaction.followup.send(f"Missing members: {missing_members}")
 
