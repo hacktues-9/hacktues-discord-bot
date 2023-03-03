@@ -61,6 +61,7 @@ async def on_ready():
 
 @bot.event
 async def on_member_join(member):
+    guild = bot.get_guild(GUILD_IDS[0])
     print(f"{member} has joined the server")
     # id = member.id as a string
     id = str(member.id)
@@ -407,6 +408,7 @@ async def get_missing_members(interaction: Interaction):
     members = cur.fetchall()
     missing_members = []
     for member in members:
+        print(member[1])
         if member[1] not in users:
             missing_members.append(member[1])
     await interaction.followup.send(f"Missing members: {missing_members}")
