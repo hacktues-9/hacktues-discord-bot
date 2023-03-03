@@ -405,7 +405,9 @@ async def fix_member_tech_roles(interaction: Interaction):
         class_value = classes[int(member[1]) - 1]
         grade = member[2]
         user_id = member[3]
-        if users[f"{name} {grade}({class_value})"]:
+
+        users_names = users.keys()
+        if f"{name} {grade}({class_value})" in users_names:
             user = users[f"{name} {grade}({class_value})"]
 
             cur.execute(
