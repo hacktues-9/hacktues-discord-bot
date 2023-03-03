@@ -387,6 +387,7 @@ async def volunteer_code(interaction: Interaction):
 @application_checks.has_permissions(administrator=True)
 async def fix_member_tech_roles(interaction: Interaction):
     await interaction.response.defer()
+    guild = interaction.guild
     cur, conn = await ht_db.connect()
     request = """
     SELECT concat(u.first_name, ' ', u.last_name) as name, i.class_id, i.grade, u.id
