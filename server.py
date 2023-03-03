@@ -408,7 +408,7 @@ async def get_missing_members(interaction: Interaction):
     missing_members = []
     for member in members:
         if member[1] not in users:
-            missing_members.append(member[0])
+            missing_members.append(member[1])
     await interaction.followup.send(f"Missing members: {missing_members}")
 
     cur.close()
