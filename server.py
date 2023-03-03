@@ -416,7 +416,7 @@ async def fix_member_tech_roles(interaction: Interaction):
                 cur.execute(
                     "SELECT technology FROM technologies WHERE id=%s", (technology,))
                 result = cur.fetchone()
-                await member.add_roles(roles[result[0]])
+                await user.add_roles(roles[result[0]])
 
 @bot.slash_command(guild_ids=GUILD_IDS, description="Get Missing Members")
 @application_checks.has_permissions(administrator=True)
