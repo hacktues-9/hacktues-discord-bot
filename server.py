@@ -549,14 +549,19 @@ async def fix_mentor_team_roles(interaction: Interaction):
             #
             # check if user has role "Team <team name>"
             if user.get_role(roles[f"Team {team_name}"].id) is not None:
-                print(f"User {user.name} already has role Team {team_name}")
+                # print(f"User {user.name} already has role Team {team_name}")
                 continue
             # check if role "Team <team name>" exists
             if f"Team {team_name}" in roles:
+                print(f"Adding role Team {team_name} to {name}")
                 await user.add_roles(roles[f"Team {team_name}"])
             else:
+                print(f"Creating role Team {team_name} and adding it to {name}")
                 roles[f"Team {team_name}"] = await guild.create_role(name=f"Team {team_name}")
                 await user.add_roles(roles[f"Team {team_name}"])
+        
+        else:
+            print(f"User {name} not found")
 
     await interaction.followup.send("Done")
 
