@@ -489,10 +489,11 @@ async def fix_member_team_roles(interaction: Interaction):
             team_name = result[0]
             # check if role "Team <team name>" exists
             if f"Team {team_name}" in roles:
-                await member.add_roles(roles[f"Team {team_name}"])
+                print(f"Team {team_name} exists")
+                await user.add_roles(roles[f"Team {team_name}"])
             else:
                 roles[f"Team {team_name}"] = await guild.create_role(name=f"Team {team_name}")
-                await member.add_roles(roles[f"Team {team_name}"])
+                await user.add_roles(roles[f"Team {team_name}"])
 
 @bot.slash_command(guild_ids=GUILD_IDS, description="Fix Mentor Team Roles")
 @application_checks.has_permissions(administrator=True)
@@ -521,10 +522,10 @@ async def fix_mentor_team_roles(interaction: Interaction):
             team_name = result[0]
             # check if role "Team <team name>" exists
             if f"Team {team_name}" in roles:
-                await member.add_roles(roles[f"Team {team_name}"])
+                await user.add_roles(roles[f"Team {team_name}"])
             else:
                 roles[f"Team {team_name}"] = await guild.create_role(name=f"Team {team_name}")
-                await member.add_roles(roles[f"Team {team_name}"])
+                await user.add_roles(roles[f"Team {team_name}"])
 
 @bot.slash_command(guild_ids=GUILD_IDS, description="Fix Tech Roles")
 @application_checks.has_permissions(administrator=True)
