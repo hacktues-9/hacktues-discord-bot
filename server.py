@@ -494,6 +494,38 @@ async def fix_member_team_roles(interaction: Interaction):
                 roles[f"Team {team_name}"] = await guild.create_role(name=f"Team {team_name}")
                 await member.add_roles(roles[f"Team {team_name}"])
 
+@bot.slash_command(guild_ids=GUILD_IDS, description="Fix Mentor Team Roles")
+@application_checks.has_permissions(administrator=True)
+async def fix_mentor_team_roles(interaction: Interaction):
+    await interaction.response.defer()
+    guild = interaction.guild
+    cur, conn = await ht_db.connect()
+    request = """
+    SELECT concat(m.first_name, ' ', m.last_name) as name, m.team_id
+    FROM mentors as m
+    WHERE m.deleted_at IS NULL AND m.team_id IS NOT NULL AND m.team_id != 1
+    """
+    cur.execute(request)
+    members = cur.fetchall()
+    users = {member.display_name: member for member in guild.members}
+    for member in members:
+        name = member[0]
+        team_id = member[1]
+
+        users_names = users.keys()
+        if name in users_names:
+            user = users[name]
+
+            cur.execute("SELECT name FROM team WHERE id=%s", (team_id,))
+            result = cur.fetchone()
+            team_name = result[0]
+            # check if role "Team <team name>" exists
+            if f"Team {team_name}" in roles:
+                await member.add_roles(roles[f"Team {team_name}"])
+            else:
+                roles[f"Team {team_name}"] = await guild.create_role(name=f"Team {team_name}")
+                await member.add_roles(roles[f"Team {team_name}"])
+
 @bot.slash_command(guild_ids=GUILD_IDS, description="Fix Tech Roles")
 @application_checks.has_permissions(administrator=True)
 async def fix_tech_roles(interaction: Interaction):
