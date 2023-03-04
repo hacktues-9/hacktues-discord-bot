@@ -469,6 +469,7 @@ async def fix_member_team_roles(interaction: Interaction):
     JOIN socials s on i.socials_id = s.id
     JOIN class c on i.class_id = c.id
     WHERE s.discord_id IS NOT NULL AND u.deleted_at IS NULL AND u.team_id IS NOT NULL AND u.team_id != 1
+    ORDER BY u.team_id
     """
     cur.execute(request)
     members = cur.fetchall()
@@ -495,14 +496,14 @@ async def fix_member_team_roles(interaction: Interaction):
             team_name = result[0]
             # check if user has role "Team <team name>"
             if user.get_role(roles[f"Team {team_name}"].id) is not None:
-                print(f"{user.name} already has role Team {team_name}")
+                print(f"{name} {grade}({class_value}) already has role Team {team_name}")
                 continue
             # check if role "Team <team name>" exists
             if f"Team {team_name}" in roles:
-                print(f"Adding role Team {team_name} to {user.name}")
+                print(f"Adding role Team {team_name} to {name} {grade}({class_value})")
                 await user.add_roles(roles[f"Team {team_name}"])
             else:
-                interaction.send(f"Add role Team {team_name} to {user.name}")
+                interaction.send(f"Add role Team {team_name} to {name} {grade}({class_value})")
 
 @bot.slash_command(guild_ids=GUILD_IDS, description="Fix Mentor Team Roles")
 @application_checks.has_permissions(administrator=True)
