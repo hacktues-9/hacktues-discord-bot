@@ -494,7 +494,7 @@ async def fix_member_team_roles(interaction: Interaction):
             result = cur.fetchone()
             team_name = result[0]
             # check if user has role "Team <team name>"
-            if user.get_role(roles[f"Team {team_name}"]) is not None:
+            if user.get_role(roles[f"Team {team_name}"].id) is not None:
                 print(f"{user.name} already has role Team {team_name}")
                 continue
             # check if role "Team <team name>" exists
@@ -538,7 +538,7 @@ async def fix_mentor_team_roles(interaction: Interaction):
             result = cur.fetchone()
             team_name = result[0]
             # check if user has role "Team <team name>"
-            if user.get_role(roles[f"Team {team_name}"]) is not None:
+            if user.get_role(roles[f"Team {team_name}"].id) is not None:
                 print(f"User {user.name} already has role Team {team_name}")
                 continue
             # check if role "Team <team name>" exists
