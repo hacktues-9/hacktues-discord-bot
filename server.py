@@ -426,14 +426,19 @@ async def fix_tech_roles(interaction: Interaction):
     # remove duplicate roles
     await interaction.response.defer()
     guild = interaction.guild
+    rols = {}
     # get list of roles from server and remove duplicates
     for role in guild.roles:
-        if role.name in roles:
+        if role.name in rols:
             print(f"Deleting role = {role.name}")
             await role.delete()
         else:
-            roles[role.name] = role
-
+            rols[role.name] = role
+    
+    #refresh roles dict
+    roles = {}
+    for role in await interaction.guild.fetch_roles():
+        roles[role.name] = role
     # that's it, we're done
     await interaction.followup.send("Tech roles have been fixed!")
 
