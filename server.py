@@ -588,7 +588,7 @@ async def get_missing_members(interaction: Interaction):
     JOIN socials s on i.socials_id = s.id
     JOIN class c on i.class_id = c.id
     WHERE s.discord_id IS NOT NULL AND u.deleted_at IS NULL AND u.team_id IS NOT NULL AND u.team_id != 1
-    ORDER BY i.grade, c.name, u.first_name, u.last_name;
+    ORDER BY concat(u.first_name, ' ', u.last_name), i.grade, i.class_id;
     """ 
     # get the list of members from the server
     users = []
