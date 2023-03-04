@@ -43,7 +43,6 @@ JOIN discord d ON s.discord_id = d.id
 WHERE d.username = %s AND d.discriminator = %s
 '''
 
-
 @bot.event
 async def on_ready():
 
