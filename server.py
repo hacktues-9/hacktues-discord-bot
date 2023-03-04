@@ -473,6 +473,12 @@ async def fix_member_team_roles(interaction: Interaction):
     cur.execute(request)
     members = cur.fetchall()
     users = {member.display_name: member for member in guild.members}
+
+    # reload roles
+    roles = {}
+    for role in await guild.fetch_roles():
+        roles[role.name] = role
+
     for member in members:
         name = member[0]
         class_value = classes[int(member[1]) - 1]
@@ -509,6 +515,12 @@ async def fix_mentor_team_roles(interaction: Interaction):
     cur.execute(request)
     members = cur.fetchall()
     users = {member.display_name: member for member in guild.members}
+
+    # reload roles
+    roles = {}
+    for role in await guild.fetch_roles():
+        roles[role.name] = role
+        
     for member in members:
         name = member[0]
         team_id = member[1]
