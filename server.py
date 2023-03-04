@@ -511,7 +511,7 @@ async def fix_member_team_roles(interaction: Interaction):
             else:
                 interaction.send(f"Add role Team {team_name} to {name} {grade}({class_value})")
 
-    interaction.followup.send("Done")
+    await interaction.followup.send("Done")
 
 @bot.slash_command(guild_ids=GUILD_IDS, description="Fix Mentor Team Roles")
 @application_checks.has_permissions(administrator=True)
@@ -558,7 +558,7 @@ async def fix_mentor_team_roles(interaction: Interaction):
                 roles[f"Team {team_name}"] = await guild.create_role(name=f"Team {team_name}")
                 await user.add_roles(roles[f"Team {team_name}"])
 
-    interaction.followup.send("Done")
+    await interaction.followup.send("Done")
 
 @bot.slash_command(guild_ids=GUILD_IDS, description="Fix Tech Roles")
 @application_checks.has_permissions(administrator=True)
