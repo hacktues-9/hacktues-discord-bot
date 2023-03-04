@@ -419,6 +419,81 @@ async def fix_member_tech_roles(interaction: Interaction):
                 result = cur.fetchone()
                 await user.add_roles(roles[result[0]])
 
+# @bot.slash_command(guild_ids=GUILD_IDS, description="Fix Mentor Tech Roles")
+# @application_checks.has_permissions(administrator=True)
+# async def fix_mentor_tech_roles(interaction: Interaction):
+#     await interaction.response.defer()
+#     guild = interaction.guild
+#     cur, conn = await ht_db.connect()
+#     request = """
+#     SELECT concat(u.first_name, ' ', u.last_name) as name, i.class_id, i.grade, u.id
+#     FROM users as u
+#     JOIN info i on u.info_id = i.id
+#     JOIN socials s on i.socials_id = s.id
+#     JOIN class c on i.class_id = c.id
+#     WHERE s.discord_id IS NOT NULL AND u.deleted_at IS NULL AND u.team_id = 1
+#     """
+#     cur.execute(request)
+#     members = cur.fetchall()
+#     users = {member.display_name: member for member in guild.members}
+#     for member in members:
+#         name = member[0]
+#         class_value = classes[int(member[1]) - 1]
+#         grade = member[2]
+#         user_id = member[3]
+
+#         users_names = users.keys()
+#         if f"{name} {grade}({class_value})" in users_names:
+#             user = users[f"{name} {grade}({class_value})"]
+
+#             cur.execute(
+#             "SELECT technologies_id FROM user_technologies WHERE user_id=%s", (user_id,))
+#             result = cur.fetchall()
+#             for techId in result:
+#                 technology = str(techId[0])
+#                 cur.execute(
+#                     "SELECT technology FROM technologies WHERE id=%s", (technology,))
+#                 result = cur.fetchone()
+#                 await user.add_roles(roles[result[0]])
+
+@bot.slash_command(guild_ids=GUILD_IDS, description="Fix Member Team Roles")
+@application_checks.has_permissions(administrator=True)
+async def fix_member_team_roles(interaction: Interaction):
+    await interaction.response.defer()
+    guild = interaction.guild
+    cur, conn = await ht_db.connect()
+    request = """
+    SELECT concat(u.first_name, ' ', u.last_name) as name, i.class_id, i.grade, u.id, u.team_id
+    FROM users as u
+    JOIN info i on u.info_id = i.id
+    JOIN socials s on i.socials_id = s.id
+    JOIN class c on i.class_id = c.id
+    WHERE s.discord_id IS NOT NULL AND u.deleted_at IS NULL AND u.team_id IS NOT NULL AND u.team_id != 1
+    """
+    cur.execute(request)
+    members = cur.fetchall()
+    users = {member.display_name: member for member in guild.members}
+    for member in members:
+        name = member[0]
+        class_value = classes[int(member[1]) - 1]
+        grade = member[2]
+        user_id = member[3]
+        team_id = member[4]
+
+        users_names = users.keys()
+        if f"{name} {grade}({class_value})" in users_names:
+            user = users[f"{name} {grade}({class_value})"]
+
+            cur.execute("SELECT name FROM team WHERE id=%s", (team_id,))
+            result = cur.fetchone()
+            team_name = result[0]
+            # check if role "Team <team name>" exists
+            if f"Team {team_name}" in roles:
+                await member.add_roles(roles[f"Team {team_name}"])
+            else:
+                roles[f"Team {team_name}"] = await guild.create_role(name=f"Team {team_name}")
+                await member.add_roles(roles[f"Team {team_name}"])
+
 @bot.slash_command(guild_ids=GUILD_IDS, description="Fix Tech Roles")
 @application_checks.has_permissions(administrator=True)
 async def fix_tech_roles(interaction: Interaction):
