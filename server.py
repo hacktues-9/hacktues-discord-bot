@@ -420,6 +420,23 @@ async def fix_member_tech_roles(interaction: Interaction):
                 result = cur.fetchone()
                 await user.add_roles(roles[result[0]])
 
+@bot.slash_command(guild_ids=GUILD_IDS, description="Fix Tech Roles")
+@application_checks.has_permissions(administrator=True)
+async def fix_tech_roles(interaction: Interaction):
+    # remove duplicate roles
+    await interaction.response.defer()
+    guild = interaction.guild
+    # get list of roles from server and remove duplicates
+    for role in guild.roles:
+        if role.name in roles:
+            await role.delete()
+        else:
+            roles[role.name] = role
+
+    # that's it, we're done
+    await interaction.followup.send("Tech roles have been fixed!")
+
+
 @bot.slash_command(guild_ids=GUILD_IDS, description="Get Missing Members")
 @application_checks.has_permissions(administrator=True)
 async def get_missing_members(interaction: Interaction):
