@@ -493,13 +493,16 @@ async def fix_member_team_roles(interaction: Interaction):
             cur.execute("SELECT name FROM team WHERE id=%s", (team_id,))
             result = cur.fetchone()
             team_name = result[0]
+            # check if user has role "Team <team name>"
+            if user.get_role(roles[f"Team {team_name}"]) is not None:
+                print(f"{user.name} already has role Team {team_name}")
+                continue
             # check if role "Team <team name>" exists
             if f"Team {team_name}" in roles:
-                print(f"Team {team_name} exists")
+                print(f"Adding role Team {team_name} to {user.name}")
                 await user.add_roles(roles[f"Team {team_name}"])
             else:
-                roles[f"Team {team_name}"] = await guild.create_role(name=f"Team {team_name}")
-                await user.add_roles(roles[f"Team {team_name}"])
+                interaction.send(f"Add role Team {team_name} to {user.name}")
 
 @bot.slash_command(guild_ids=GUILD_IDS, description="Fix Mentor Team Roles")
 @application_checks.has_permissions(administrator=True)
