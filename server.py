@@ -497,6 +497,9 @@ async def fix_member_team_roles(interaction: Interaction):
             # check if user has role "Team <team name>"
             if user.get_role(roles[f"Team {team_name}"].id) is not None:
                 print(f"{name} {grade}({class_value}) already has role Team {team_name}")
+                # update team_role column in database
+                cur.execute("UPDATE users SET team_role=%s WHERE id=%s", (True, user_id))
+                conn.commit()
                 continue
             # check if role "Team <team name>" exists
             if f"Team {team_name}" in roles:
