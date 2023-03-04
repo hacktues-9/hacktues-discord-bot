@@ -429,6 +429,7 @@ async def fix_tech_roles(interaction: Interaction):
     # get list of roles from server and remove duplicates
     for role in guild.roles:
         if role.name in roles:
+            print(f"Deleting role = {role.name}")
             await role.delete()
         else:
             roles[role.name] = role
