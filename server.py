@@ -468,7 +468,7 @@ async def fix_member_team_roles(interaction: Interaction):
     JOIN info i on u.info_id = i.id
     JOIN socials s on i.socials_id = s.id
     JOIN class c on i.class_id = c.id
-    WHERE s.discord_id IS NOT NULL AND u.deleted_at IS NULL AND u.team_id IS NOT NULL AND u.team_id != 1
+    WHERE s.discord_id IS NOT NULL AND u.deleted_at IS NULL AND u.team_id IS NOT NULL AND u.team_id != 1 AND u.team_role IS false
     ORDER BY u.team_id
     """
     cur.execute(request)
@@ -504,9 +504,14 @@ async def fix_member_team_roles(interaction: Interaction):
             # check if role "Team <team name>" exists
             if f"Team {team_name}" in roles:
                 print(f"Adding role Team {team_name} to {name} {grade}({class_value})")
+                # update team_role column in database
+                cur.execute("UPDATE users SET team_role=%s WHERE id=%s", (True, user_id))
+                conn.commit()
                 await user.add_roles(roles[f"Team {team_name}"])
             else:
                 interaction.send(f"Add role Team {team_name} to {name} {grade}({class_value})")
+
+    interaction.followup.send("Done")
 
 @bot.slash_command(guild_ids=GUILD_IDS, description="Fix Mentor Team Roles")
 @application_checks.has_permissions(administrator=True)
@@ -552,6 +557,8 @@ async def fix_mentor_team_roles(interaction: Interaction):
             else:
                 roles[f"Team {team_name}"] = await guild.create_role(name=f"Team {team_name}")
                 await user.add_roles(roles[f"Team {team_name}"])
+
+    interaction.followup.send("Done")
 
 @bot.slash_command(guild_ids=GUILD_IDS, description="Fix Tech Roles")
 @application_checks.has_permissions(administrator=True)
