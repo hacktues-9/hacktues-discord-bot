@@ -490,7 +490,7 @@ async def fix_member_team_roles(interaction: Interaction):
         if f"{name} {grade}({class_value})" in users_names:
             user = users[f"{name} {grade}({class_value})"]
 
-            cur.execute("SELECT name FROM team WHERE id=%s", (team_id,))
+            cur.execute("SELECT name FROM teams WHERE id=%s", (team_id,))
             result = cur.fetchone()
             team_name = result[0]
             # check if user has role "Team <team name>"
@@ -534,9 +534,10 @@ async def fix_mentor_team_roles(interaction: Interaction):
 
             
 
-            cur.execute("SELECT name FROM team WHERE id=%s", (team_id,))
+            cur.execute("SELECT name FROM teams WHERE id=%s", (team_id,))
             result = cur.fetchone()
             team_name = result[0]
+            #
             # check if user has role "Team <team name>"
             if user.get_role(roles[f"Team {team_name}"].id) is not None:
                 print(f"User {user.name} already has role Team {team_name}")
