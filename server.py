@@ -520,7 +520,7 @@ async def fix_mentor_team_roles(interaction: Interaction):
     roles = {}
     for role in await guild.fetch_roles():
         roles[role.name] = role
-        
+
     for member in members:
         name = member[0]
         team_id = member[1]
@@ -529,9 +529,15 @@ async def fix_mentor_team_roles(interaction: Interaction):
         if name in users_names:
             user = users[name]
 
+            
+
             cur.execute("SELECT name FROM team WHERE id=%s", (team_id,))
             result = cur.fetchone()
             team_name = result[0]
+            # check if user has role "Team <team name>"
+            if user.get_role(roles[f"Team {team_name}"]) is not None:
+                print(f"User {user.name} already has role Team {team_name}")
+                continue
             # check if role "Team <team name>" exists
             if f"Team {team_name}" in roles:
                 await user.add_roles(roles[f"Team {team_name}"])
