@@ -339,7 +339,7 @@ async def delete_teams(interaction: Interaction):
 
 @bot.slash_command(guild_ids=GUILD_IDS, description="Fix Organizator in Team")
 @application_checks.has_permissions(administrator=True)
-async def fix_Organizator_in_team(interaction: Interaction):
+async def fix_organizator_in_team(interaction: Interaction):
     guild = interaction.guild
     await interaction.response.defer()
     # get the list of teams from the database
