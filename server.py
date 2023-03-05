@@ -337,6 +337,32 @@ async def delete_teams(interaction: Interaction):
 
     await interaction.followup.send("Teams have been deleted!")
 
+@bot.slash_command(guild_ids=GUILD_IDS, description="Fix Organizator in Team")
+@application_checks.has_permissions(administrator=True)
+async def fix_Organizator_in_team(interaction: Interaction):
+    guild = interaction.guild
+    await interaction.response.defer()
+    # get the list of teams from the database
+    cur, conn = await ht_db.connect()
+    cur.execute("SELECT name FROM teams")
+    teams = cur.fetchall()
+    category_ids = {}
+
+    # get the category ids for each team
+    for team in teams:
+        # get channel with name "TEAM <team name>"
+        for channel in guild.channels:
+            if channel.name == f"TEAM {team[0].upper()}":
+                category_ids[team[0]] = channel.id
+
+    # add the organizator role to see the categories
+    for team in teams:
+        if team[0] in category_ids:
+            category = guild.get_channel(category_ids[team[0]])
+            await category.set_permissions(guild.get_role(1072536016721825822), read_messages=True)
+
+    await interaction.followup.send("Teams have been deleted!")
+
 @bot.slash_command(guild_ids=GUILD_IDS, description="Verification Message")
 @application_checks.has_permissions(administrator=True)
 async def verification_message(interaction: Interaction):
