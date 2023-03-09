@@ -38,6 +38,10 @@ async def ticket_sys(interaction: Interaction, problem: str, bot: commands.Bot):
     roles = interaction.user.roles
     guild = interaction.guild
 
+    print(f"{interaction.user.name} has sent a problem: {problem}")
+    print(f"Roles: {roles}")
+    print(f"Channel: {channel.name}")
+
     if "Team" in channel.name:
         for role in roles:
             if "Team" in role.name:
