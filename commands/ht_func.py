@@ -41,7 +41,7 @@ async def ticket_sys(interaction: Interaction, problem: str, bot: commands.Bot):
     if "team" in channel.name:
         for role in roles:
             if "Team" in role.name:
-                await interaction.followup.send(f"Your problem has been sent to the mentors")
+                await interaction.followup.send(f"Вашият проблем е изпратен на менторите")
 
                 available_mentor = guild.get_role(1024553918795091998)
                 claimed_mentor = guild.get_role(1024554391887413328)
@@ -49,7 +49,7 @@ async def ticket_sys(interaction: Interaction, problem: str, bot: commands.Bot):
                 claims = guild.get_channel(1024426110265589931)
                 closed = guild.get_channel(1024576000157306972)
 
-                ticket = await log_channel.send(f"{available_mentor.mention},help {role.mention} with: \n{problem}")
+                ticket = await log_channel.send(f"{available_mentor.mention},помогнете на {role.mention} с: \n{problem}")
 
                 def check_ticket(r, u):
                     return (str(r) == "🎟️" and u != bot.user and (available_mentor in u.roles) and (r.message.id == ticket.id))
@@ -57,8 +57,12 @@ async def ticket_sys(interaction: Interaction, problem: str, bot: commands.Bot):
                 while True:
                     await ticket.add_reaction("🎟️")
                     _, assigned_mentor = await bot.wait_for("reaction_add", check=check_ticket)
+                    is_teams_mentor = False
+                    #check if is already teams mentor
+                    if await assigned_mentor.get_role(role.id) is None:
+                        await assigned_mentor.add_roles(role)
+                        is_teams_mentor = True
 
-                    await assigned_mentor.add_roles(role)
                     await assigned_mentor.add_roles(claimed_mentor)
                     await assigned_mentor.remove_roles(available_mentor)
                     await ticket.clear_reaction("🎟️")
@@ -77,7 +81,8 @@ async def ticket_sys(interaction: Interaction, problem: str, bot: commands.Bot):
 
                     reaction, _ = await bot.wait_for("reaction_add", check=check_reaction)
 
-                    await assigned_mentor.remove_roles(role)
+                    if not is_teams_mentor:
+                        await assigned_mentor.remove_roles(role)
                     await assigned_mentor.remove_roles(claimed_mentor)
                     await assigned_mentor.add_roles(available_mentor)
                     await ticket.clear_reaction("✅")
