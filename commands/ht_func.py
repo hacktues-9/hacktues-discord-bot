@@ -37,12 +37,8 @@ async def ticket_sys(interaction: Interaction, problem: str, bot: commands.Bot):
     channel = interaction.channel
     roles = interaction.user.roles
     guild = interaction.guild
-
-    print(f"{interaction.user.name} has sent a problem: {problem}")
-    print(f"Roles: {roles}")
-    print(f"Channel: {channel.name}")
-
-    if "Team" in channel.name:
+    
+    if "team" in channel.name:
         for role in roles:
             if "Team" in role.name:
                 await interaction.followup.send(f"Your problem has been sent to the mentors")
@@ -113,6 +109,11 @@ async def ticket_sys(interaction: Interaction, problem: str, bot: commands.Bot):
                         continue
 
                 break
+            else:
+                await interaction.followup.send("Можеш да пращаш проблеми само ако си в отбор")
+        
+    else:
+        await interaction.followup.send("Можеш да пращаш проблеми само в каналите на отборите")
 
 class MentorModal(nextcord.ui.Modal):
     def __init__(self):
