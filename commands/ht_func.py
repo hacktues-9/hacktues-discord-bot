@@ -37,7 +37,7 @@ async def ticket_sys(interaction: Interaction, problem: str, bot: commands.Bot):
     channel = interaction.channel
     roles = interaction.user.roles
     guild = interaction.guild
-    
+
     if "team" in channel.name:
         for role in roles:
             if "Team" in role.name:
@@ -109,8 +109,6 @@ async def ticket_sys(interaction: Interaction, problem: str, bot: commands.Bot):
                         continue
 
                 break
-            else:
-                await interaction.followup.send("Можеш да пращаш проблеми само ако си в отбор")
         
     else:
         await interaction.followup.send("Можеш да пращаш проблеми само в каналите на отборите")
