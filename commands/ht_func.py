@@ -57,11 +57,12 @@ async def ticket_sys(interaction: Interaction, problem: str, bot: commands.Bot):
                 while True:
                     await ticket.add_reaction("🎟️")
                     _, assigned_mentor = await bot.wait_for("reaction_add", check=check_ticket)
-                    is_teams_mentor = False
+                    is_teams_mentor = True
                     #check if is already teams mentor
-                    if await assigned_mentor.get_role(role.id) is None:
+                    has_role = await assigned_mentor.get_role(role.id)
+                    if has_role is None:
                         await assigned_mentor.add_roles(role)
-                        is_teams_mentor = True
+                        is_teams_mentor = False
 
                     await assigned_mentor.add_roles(claimed_mentor)
                     await assigned_mentor.remove_roles(available_mentor)
