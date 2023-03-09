@@ -38,9 +38,9 @@ async def ticket_sys(interaction: Interaction, problem: str, bot: commands.Bot):
     roles = interaction.user.roles
     guild = interaction.guild
 
-    if "team" in channel.name:
+    if "Team" in channel.name:
         for role in roles:
-            if "team" in role.name:
+            if "Team" in role.name:
                 await interaction.followup.send(f"Your problem has been sent to the mentors")
 
                 available_mentor = guild.get_role(1024553918795091998)
