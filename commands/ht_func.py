@@ -71,9 +71,9 @@ async def ticket_sys(interaction: Interaction, problem: str, bot: commands.Bot):
                     def check_confirmation(r, u):
                         return((str(r) == "✅" or str(r) == "❌") and (role in u.roles) and (u != bot.user) and (r.message.id == confirmation.id))
 
-                    await interaction.channel.send(f"{assigned_mentor.name} has been assigned for your problem")
+                    await interaction.channel.send(f"{assigned_mentor.nick} се е заел с вашия проблем")
 
-                    assignment = await claims.send(f"{assigned_mentor.name} has been assigned for {role.name}")
+                    assignment = await claims.send(f"{assigned_mentor.nick} се е заел с проблема на {role.name}")
 
                     reaction, _ = await bot.wait_for("reaction_add", check=check_reaction)
 
@@ -84,7 +84,7 @@ async def ticket_sys(interaction: Interaction, problem: str, bot: commands.Bot):
                     await ticket.clear_reaction("❌")
 
                     if str(reaction) == "✅":
-                        confirmation = await interaction.channel.send(f"{role.mention}, your problem has been marked as solved!")
+                        confirmation = await interaction.channel.send(f"{role.mention}, проблема ви е зададен като решен!")
 
                         await confirmation.add_reaction("✅")
                         await confirmation.add_reaction("❌")
@@ -97,15 +97,15 @@ async def ticket_sys(interaction: Interaction, problem: str, bot: commands.Bot):
                         if str(reaction) == "✅":
                             await ticket.delete()
                             await assignment.delete()
-                            await closed.send(f"{assigned_mentor.name} solved {role.name}'s problem")
+                            await closed.send(f"{assigned_mentor.name} реши проблема на {role.name}")
                             break
                         elif str(reaction) == "❌":
-                            await interaction.channel.send(f"{role.mention}, your problem has been sent to be reassigned!")
-                            ticket = await log_channel.send(f"{available_mentor.mention}, {role.mention}'s problem has been reopened: \n{problem}")
+                            await interaction.channel.send(f"{role.mention}, проблема ви е отворен наново!")
+                            ticket = await log_channel.send(f"{available_mentor.mention}, проблема на {role.mention} е отворен отново : \n{problem}")
                             continue
                     elif str(reaction) == "❌":
-                        await interaction.channel.send(f"{role.mention}, your problem has been sent to be reassigned!")
-                        ticket = await log_channel.send(f"{available_mentor.mention}, {role.mention}'s problem has been reopened: \n{problem}")
+                        await interaction.channel.send(f"{role.mention}, проблема ви е отворен наново!")
+                        ticket = await log_channel.send(f"{available_mentor.mention}, проблема на {role.mention} е отворен отново : \n{problem}")
                         continue
 
                 break
